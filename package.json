@@ -1,0 +1,27 @@
+{
+  "name": "michelin-app",
+  "version": "1.0.0",
+  "description": "Sistema de Gerenciamento de Oficina Mecânica - Docker + PostgreSQL",
+  "main": "docker-compose.yml",
+  "scripts": {
+  "dev": "docker compose up",
+  "dev:build": "docker compose up --build",
+  "stop": "docker compose down",
+  "stop:clean": "docker compose down -v",
+  "logs": "docker compose logs -f",
+  "logs:backend": "docker compose logs -f backend",
+  "logs:frontend": "docker compose logs -f frontend",
+  "logs:db": "docker compose logs -f db",
+  "ps": "docker compose ps"
+},
+  "keywords": [
+    "oficina",
+    "mecânica",
+    "docker",
+    "postgresql",
+    "react",
+    "express"
+  ],
+  "author": "Marcos Issa",
+  "license": "MIT"
+}
