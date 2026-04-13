@@ -23,20 +23,43 @@ const Navbar = () => {
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
-    const drawer = (_jsxs(Box, { onClick: handleDrawerToggle, sx: { textAlign: 'center' }, children: [_jsx(Typography, { variant: "h6", sx: { my: 2 }, children: "\uD83D\uDE97 Oficina Mec\u00E2nica" }), _jsx(List, { children: navItems.map((item) => (_jsxs(ListItem, { component: Link, to: item.path, sx: {
+    const drawer = (_jsxs(Box, { onClick: handleDrawerToggle, sx: { textAlign: 'center' }, children: [
+        _jsx(Box, { sx: { py: 2, display: 'flex', justifyContent: 'center', alignItems: 'center' }, children: 
+            _jsx(Typography, { variant: "h6", sx: { fontWeight: 700, letterSpacing: 1 }, children: "OFICINA MECÂNICA" })
+        }), 
+        _jsx(List, { children: navItems.map((item) => (_jsxs(ListItem, { component: Link, to: item.path, sx: {
                         color: 'inherit',
                         textDecoration: 'none',
-                        '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' },
+                        '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.08)' },
                         cursor: 'pointer'
                     }, children: [_jsx(ListItemIcon, { children: item.icon }), _jsx(ListItemText, { primary: item.text })] }, item.text))) })] }));
-    return (_jsxs(Box, { sx: { display: 'flex' }, children: [_jsx(AppBar, { position: "static", color: "primary", children: _jsxs(Toolbar, { children: [isMobile && (_jsx(IconButton, { color: "inherit", "aria-label": "open drawer", edge: "start", onClick: handleDrawerToggle, sx: { mr: 2 }, children: _jsx(MenuIcon, {}) })), _jsx(Typography, { variant: "h6", component: "div", sx: { flexGrow: 1 }, children: "\uD83D\uDE97 Oficina Mec\u00E2nica" }), !isMobile && (_jsx(Box, { sx: { display: 'flex' }, children: navItems.map((item) => (_jsx(Button, { component: Link, to: item.path, sx: {
-                                    color: '#ffffff',
-                                    mx: 1,
+    return (_jsxs(Box, { sx: { display: 'flex' }, children: [_jsx(AppBar, { position: "sticky", elevation: 0, sx: { borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }, children: _jsxs(Toolbar, { children: [
+        isMobile && (_jsx(IconButton, { color: "inherit", "aria-label": "open drawer", edge: "start", onClick: handleDrawerToggle, sx: { mr: 2 }, children: _jsx(MenuIcon, {}) })), 
+        _jsxs(Box, { sx: { flexGrow: 1, display: 'flex', alignItems: 'center' }, children: [
+            _jsx(Box, { id: "logo-placeholder", sx: { 
+                width: 40, 
+                height: 40, 
+                bgcolor: 'rgba(255,255,255,0.1)', 
+                borderRadius: '8px',
+                mr: 2,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: '1px dashed rgba(255,255,255,0.3)'
+            }, children: _jsx(Typography, { variant: "caption", sx: { fontSize: '8px', opacity: 0.7 }, children: "LOGO" }) }),
+            _jsx(Typography, { variant: "h6", component: "div", sx: { fontWeight: 700, letterSpacing: 0.5 }, children: "OFICINA MECÂNICA" })
+        ]}), 
+        !isMobile && (_jsx(Box, { sx: { display: 'flex' }, children: navItems.map((item) => (_jsx(Button, { component: Link, to: item.path, sx: {
+                                    color: 'rgba(255, 255, 255, 0.85)',
+                                    mx: 0.5,
                                     fontWeight: 600,
-                                    padding: '8px 16px',
+                                    fontSize: '0.875rem',
+                                    textTransform: 'none',
+                                    padding: '6px 16px',
+                                    borderRadius: '6px',
                                     '&:hover': {
-                                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                                        boxShadow: '0 0 5px rgba(255, 255, 255, 0.3)'
+                                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                        color: '#ffffff',
                                     }
                                 }, startIcon: item.icon, children: item.text }, item.text))) }))] }) }), _jsx(Box, { component: "nav", children: _jsx(Drawer, { variant: "temporary", open: mobileOpen, onClose: handleDrawerToggle, ModalProps: {
                         keepMounted: true, // Better open performance on mobile.

@@ -96,7 +96,7 @@ const Dashboard = () => {
             border: '2px solid', 
             borderColor: 'primary.main',
             bgcolor: 'white',
-            boxShadow: '0 12px 40px rgba(0,45,114,0.12)',
+            boxShadow: '0 8px 30px rgba(0,0,0,0.08)',
             transition: 'transform 0.2s',
             '&:hover': { transform: 'translateY(-2px)' }
           }}
@@ -194,11 +194,11 @@ const Dashboard = () => {
 
         <Grid item xs={12} lg={4}>
           <Stack spacing={4}>
-            <Paper elevation={0} sx={{ p: 4, borderRadius: 4, bgcolor: 'secondary.main', color: 'secondary.contrastText' }}>
+            <Paper elevation={0} sx={{ p: 4, borderRadius: 4, bgcolor: 'primary.main', color: 'primary.contrastText' }}>
               <Typography variant="overline" sx={{ opacity: 0.8, fontWeight: 900 }}>RECEITA TOTAL</Typography>
-              <Typography variant="h2" sx={{ mt: 1, mb: 1.5, letterSpacing: '-0.03em' }}>R$ {faturamentoTotal.toFixed(2)}</Typography>
+              <Typography variant="h2" sx={{ mt: 1, mb: 1.5, letterSpacing: '-0.03em', color: 'inherit' }}>R$ {faturamentoTotal.toFixed(2)}</Typography>
               <Typography variant="body2" sx={{ opacity: 0.9, lineHeight: 1.5 }}>Volume total processado em serviços finalizados e orçamentos.</Typography>
-              <Button variant="contained" sx={{ mt: 4, bgcolor: 'white', color: 'black', '&:hover': { bgcolor: '#F1F5F9' } }} fullWidth>
+              <Button variant="contained" sx={{ mt: 4, bgcolor: 'white', color: 'black', fontWeight: 800, '&:hover': { bgcolor: '#F1F5F9' } }} fullWidth>
                 RELATÓRIO COMPLETO
               </Button>
             </Paper>

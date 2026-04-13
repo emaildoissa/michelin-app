@@ -39,9 +39,134 @@ const Dashboard = () => {
     if (loading) {
         return _jsx(Typography, { children: "Carregando..." });
     }
-    return (_jsxs(Box, { sx: { flexGrow: 1 }, children: [_jsx(Typography, { variant: "h4", gutterBottom: true, sx: { mb: 4 }, children: "Dashboard" }), _jsxs(Grid, { container: true, spacing: 3, children: [_jsx(Grid, { item: true, xs: 10, sm: 6, md: 3, children: _jsxs(Paper, { elevation: 3, sx: { p: 2, textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '160px' }, children: [_jsx(Typography, { variant: "h6", color: "primary", children: "Clientes" }), _jsx(Typography, { variant: "h3", children: totalClientes }), _jsx(Typography, { variant: "body2", color: "text.secondary", children: "Total cadastrado" })] }) }), _jsx(Grid, { item: true, xs: 10, sm: 6, md: 3, children: _jsxs(Paper, { elevation: 3, sx: { p: 2, textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '160px' }, children: [_jsx(Typography, { variant: "h6", color: "primary", children: "Ve\u00EDculos" }), _jsx(Typography, { variant: "h3", children: totalVeiculos }), _jsx(Typography, { variant: "body2", color: "text.secondary", children: "Total cadastrado" })] }) }), _jsx(Grid, { item: true, xs: 10, sm: 6, md: 3, children: _jsxs(Paper, { elevation: 3, sx: { p: 2, textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '160px' }, children: [_jsx(Typography, { variant: "h6", color: "primary", children: "Ordens em Andamento" }), _jsx(Typography, { variant: "h3", children: ordensEmAndamento }), _jsx(Typography, { variant: "body2", color: "text.secondary", children: "Servi\u00E7os em execu\u00E7\u00E3o" })] }) }), _jsx(Grid, { item: true, xs: 10, sm: 6, md: 3, children: _jsxs(Paper, { elevation: 3, sx: { p: 2, textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '160px' }, children: [_jsx(Typography, { variant: "h6", color: "primary", children: "Faturamento" }), _jsxs(Typography, { variant: "h3", children: ["R$ ", faturamentoTotal.toFixed(2)] }), _jsx(Typography, { variant: "body2", color: "text.secondary", children: "Total acumulado" })] }) }), _jsx(Grid, { item: true, xs: 10, md: 6, children: _jsxs(Card, { elevation: 3, children: [_jsx(CardHeader, { title: "Ordens de Servi\u00E7o Recentes" }), _jsx(CardContent, { children: ordensRecentes.length > 0 ? (_jsx(List, { children: ordensRecentes.map((ordem) => {
+    return (_jsxs(Box, { sx: { flexGrow: 1, backgroundColor: '#f0f2f5', minHeight: 'calc(100vh - 64px)', p: 3, borderRadius: '16px' }, children: [
+        _jsx(Typography, { variant: "h4", gutterBottom: true, sx: { mb: 4, fontWeight: 800, color: '#1a1a1a', textAlign: 'left', letterSpacing: '-0.5px' }, children: "Dashboard" }), 
+        _jsxs(Grid, { container: true, spacing: 3, children: [
+            _jsx(Grid, { item: true, xs: 12, sm: 6, md: 3, children: 
+                _jsxs(Paper, { elevation: 0, sx: { 
+                    p: 3, 
+                    textAlign: 'left', 
+                    height: '100%', 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    justifyContent: 'center', 
+                    minHeight: '140px', 
+                    borderRadius: '12px',
+                    border: '1px solid #e0e0e0',
+                    borderLeft: '5px solid #000000',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+                    transition: 'transform 0.2s',
+                    '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }
+                }, children: [
+                    _jsx(Typography, { variant: "body2", sx: { color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', mb: 1 }, children: "Clientes" }), 
+                    _jsx(Typography, { variant: "h3", sx: { fontWeight: 800, color: '#000000' }, children: totalClientes }), 
+                    _jsx(Typography, { variant: "caption", sx: { color: 'text.secondary', mt: 1 }, children: "Total cadastrado" })
+                ] })
+            }), 
+            _jsx(Grid, { item: true, xs: 12, sm: 6, md: 3, children: 
+                _jsxs(Paper, { elevation: 0, sx: { 
+                    p: 3, 
+                    textAlign: 'left', 
+                    height: '100%', 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    justifyContent: 'center', 
+                    minHeight: '140px', 
+                    borderRadius: '12px',
+                    border: '1px solid #e0e0e0',
+                    borderLeft: '5px solid #333333',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+                    transition: 'transform 0.2s',
+                    '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }
+                }, children: [
+                    _jsx(Typography, { variant: "body2", sx: { color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', mb: 1 }, children: "Veículos" }), 
+                    _jsx(Typography, { variant: "h3", sx: { fontWeight: 800, color: '#000000' }, children: totalVeiculos }), 
+                    _jsx(Typography, { variant: "caption", sx: { color: 'text.secondary', mt: 1 }, children: "Total cadastrado" })
+                ] })
+            }), 
+            _jsx(Grid, { item: true, xs: 12, sm: 6, md: 3, children: 
+                _jsxs(Paper, { elevation: 0, sx: { 
+                    p: 3, 
+                    textAlign: 'left', 
+                    height: '100%', 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    justifyContent: 'center', 
+                    minHeight: '140px', 
+                    borderRadius: '12px',
+                    border: '1px solid #e0e0e0',
+                    borderLeft: '5px solid #666666',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+                    transition: 'transform 0.2s',
+                    '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }
+                }, children: [
+                    _jsx(Typography, { variant: "body2", sx: { color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', mb: 1 }, children: "Em Andamento" }), 
+                    _jsx(Typography, { variant: "h3", sx: { fontWeight: 800, color: '#000000' }, children: ordensEmAndamento }), 
+                    _jsx(Typography, { variant: "caption", sx: { color: 'text.secondary', mt: 1 }, children: "Serviços ativos" })
+                ] })
+            }), 
+            _jsx(Grid, { item: true, xs: 12, sm: 6, md: 3, children: 
+                _jsxs(Paper, { elevation: 0, sx: { 
+                    p: 3, 
+                    textAlign: 'left', 
+                    height: '100%', 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    justifyContent: 'center', 
+                    minHeight: '140px', 
+                    borderRadius: '12px',
+                    border: '1px solid #000000',
+                    bgcolor: '#000000',
+                    color: '#ffffff',
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.15)',
+                    transition: 'transform 0.2s',
+                    '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 15px 40px rgba(0,0,0,0.2)' }
+                }, children: [
+                    _jsx(Typography, { variant: "body2", sx: { color: 'rgba(255,255,255,0.7)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', mb: 1 }, children: "Faturamento" }), 
+                    _jsxs(Typography, { variant: "h4", sx: { fontWeight: 900 }, children: ["R$ ", faturamentoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })] }), 
+                    _jsx(Typography, { variant: "caption", sx: { color: 'rgba(255,255,255,0.5)', mt: 1 }, children: "Total acumulado" })
+                ] })
+            }), 
+            _jsx(Grid, { item: true, xs: 12, md: 7, children: 
+                _jsxs(Card, { elevation: 0, sx: { borderRadius: '16px', border: '1px solid #e0e0e0', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }, children: [
+                    _jsx(CardHeader, { title: "Ordens de Serviço Recentes", titleTypographyProps: { fontWeight: 800 } }), 
+                    _jsx(CardContent, { sx: { p: 0 }, children: ordensRecentes.length > 0 ? (_jsx(List, { sx: { p: 0 }, children: ordensRecentes.map((ordem) => {
                                             const veiculo = veiculos.find(v => v.id === ordem.veiculoId);
-                                            return (_jsxs("div", { children: [_jsx(ListItem, { children: _jsx(ListItemText, { primary: `OS #${ordem.id} - ${veiculo ? `${veiculo.marca} ${veiculo.modelo}` : 'Veículo não encontrado'}`, secondary: _jsxs(_Fragment, { children: [_jsxs(Typography, { component: "span", variant: "body2", color: "text.primary", children: ["Status: ", ordem.status] }), _jsx("br", {}), _jsxs(Typography, { component: "span", variant: "body2", children: ["Data: ", new Date(ordem.dataEntrada).toLocaleDateString('pt-BR')] }), _jsx("br", {}), _jsxs(Typography, { component: "span", variant: "body2", children: ["Valor: R$ ", ordem.valorTotal.toFixed(2)] })] }) }) }), _jsx(Divider, {})] }, ordem.id));
-                                        }) })) : (_jsx(Typography, { children: "Nenhuma ordem de servi\u00E7o encontrada" })) })] }) }), _jsx(Grid, { item: true, xs: 10, md: 6, children: _jsxs(Card, { elevation: 3, children: [_jsx(CardHeader, { title: "Clientes Recentes" }), _jsx(CardContent, { children: clientes.length > 0 ? (_jsx(List, { children: clientes.slice(0, 5).map((cliente) => (_jsxs("div", { children: [_jsx(ListItem, { children: _jsx(ListItemText, { primary: cliente.nome, secondary: `Cliente #${cliente.id}` }) }), _jsx(Divider, {})] }, cliente.id))) })) : (_jsx(Typography, { children: "Nenhum cliente encontrado" })) })] }) })] })] }));
+                                            return (_jsxs("div", { children: [
+                                                _jsx(ListItem, { sx: { py: 2, px: 3 }, children: 
+                                                    _jsx(ListItemText, { 
+                                                        primary: `OS #${ordem.id.slice(0,8)}...`, 
+                                                        primaryTypographyProps: { fontWeight: 700 },
+                                                        secondary: _jsxs(Box, { sx: { mt: 1 }, children: [
+                                                            _jsx(Typography, { component: "span", variant: "body2", sx: { fontWeight: 600, color: 'text.primary' }, children: veiculo ? `${veiculo.marca} ${veiculo.modelo} (${veiculo.placa})` : 'Veículo não encontrado' }), 
+                                                            _jsx("br", {}), 
+                                                            _jsxs(Box, { sx: { mt: 1, display: 'flex', gap: 1, alignItems: 'center' }, children: [
+                                                                _jsx(Box, { sx: { px: 1, py: 0.25, bgcolor: '#f0f0f0', borderRadius: '4px', fontSize: '10px', fontWeight: 800, textTransform: 'uppercase' }, children: ordem.status }),
+                                                                _jsx(Typography, { component: "span", variant: "caption", sx: { color: 'text.secondary' }, children: new Date(ordem.dataEntrada).toLocaleDateString('pt-BR') }),
+                                                                _jsxs(Typography, { component: "span", variant: "subtitle2", sx: { ml: 'auto', fontWeight: 800, color: '#000000' }, children: ["R$ ", ordem.valorTotal.toFixed(2)] })
+                                                            ] })
+                                                        ] }) 
+                                                    }) 
+                                                }), 
+                                                _jsx(Divider, {})
+                                            ] }, ordem.id));
+                                        }) })) : (_jsx(Box, { sx: { p: 3 }, children: _jsx(Typography, { children: "Nenhuma ordem de serviço encontrada" }) })) })] })
+            }), 
+            _jsx(Grid, { item: true, xs: 12, md: 5, children: 
+                _jsxs(Card, { elevation: 0, sx: { borderRadius: '16px', border: '1px solid #e0e0e0', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }, children: [
+                    _jsx(CardHeader, { title: "Clientes Recentes", titleTypographyProps: { fontWeight: 800 } }), 
+                    _jsx(CardContent, { sx: { p: 0 }, children: clientes.length > 0 ? (_jsx(List, { sx: { p: 0 }, children: clientes.slice(0, 5).map((cliente) => (_jsxs("div", { children: [
+                                                _jsx(ListItem, { sx: { py: 2, px: 3 }, children: 
+                                                    _jsx(ListItemText, { 
+                                                        primary: cliente.nome, 
+                                                        primaryTypographyProps: { fontWeight: 700 },
+                                                        secondary: `${cliente.email || 'Sem email'} • ID: ${cliente.id.toString().slice(0,8)}...` 
+                                                    }) 
+                                                }), 
+                                                _jsx(Divider, {})
+                                            ] }, cliente.id))) })) : (_jsx(Box, { sx: { p: 3 }, children: _jsx(Typography, { children: "Nenhum cliente encontrado" }) })) })] })
+            })
+        ] })
+    ] }));
 };
 export default Dashboard;

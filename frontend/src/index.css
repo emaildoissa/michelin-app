@@ -1,11 +1,11 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: #1a1a1a;
+  background-color: #f8f9fa;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -15,62 +15,74 @@
 
 a {
   font-weight: 600;
-  color: #0d47a1;
-  text-decoration: inherit;
+  color: #000000;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
 }
 a:hover {
-  color: #002171;
+  opacity: 0.7;
   text-decoration: underline;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+h1, h2, h3, h4, h5, h6 {
+  color: #000000;
+  margin-top: 0;
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
+  border-radius: 6px;
+  border: 1px solid #000000;
   padding: 0.6em 1.2em;
-  font-size: 1em;
+  font-size: 0.875rem;
   font-weight: 600;
   font-family: inherit;
-  background-color: #0d47a1;
-  color: white;
+  background-color: #000000;
+  color: #ffffff;
   cursor: pointer;
-  transition: all 0.25s ease;
-}
-button:hover {
-  background-color: #002171;
-  border-color: #ffffff;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto #5472d3;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-@media (prefers-color-scheme: light) {
+button:hover {
+  background-color: #333333;
+  border-color: #333333;
+}
+
+button:focus,
+button:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+}
+
+@media (prefers-color-scheme: dark) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    color: rgba(255, 255, 255, 0.87);
+    background-color: #121212;
   }
-  a:hover {
-    color: #002171;
+  
+  a {
+    color: #ffffff;
   }
+  
+  h1, h2, h3, h4, h5, h6 {
+    color: #ffffff;
+  }
+
   button {
-    background-color: #0d47a1;
-    color: white;
+    background-color: #ffffff;
+    color: #000000;
+    border-color: #ffffff;
   }
+
   button:hover {
-    background-color: #002171;
+    background-color: #e0e0e0;
+    border-color: #e0e0e0;
   }
 }
