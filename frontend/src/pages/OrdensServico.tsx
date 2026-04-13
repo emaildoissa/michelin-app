@@ -134,6 +134,7 @@ const OrdensServico = () => {
       case 'Orçamento aprovado': return { bg: '#E0F2FE', color: '#0369A1', border: '#0EA5E9' };
       case 'Em andamento': return { bg: '#D1FAE5', color: '#065F46', border: '#10B981' };
       case 'Concluído': return { bg: '#F3E8FF', color: '#6B21A8', border: '#A855F7' };
+      case 'Entregue': return { bg: '#E0F2F1', color: '#00695C', border: '#26A69A' };
       case 'Cancelado': return { bg: '#FEE2E2', color: '#991B1B', border: '#EF4444' };
       default: return { bg: '#F1F5F9', color: '#475569', border: '#94A3B8' };
     }
@@ -143,72 +144,90 @@ const OrdensServico = () => {
 
   return (
     <Box sx={{ pb: 4 }}>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={4}>
+      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={5}>
         <Box>
-          <Typography variant="h4" sx={{ fontWeight: 900, color: 'primary.main', letterSpacing: '-1px' }}>Ordens de Serviço</Typography>
-          <Typography variant="body1" color="text.secondary">Gestão de fluxo operacional e faturamento.</Typography>
+          <Typography variant="h4" sx={{ color: 'primary.main', mb: 0.5 }}>Ordens de Serviço</Typography>
+          <Typography variant="body1" sx={{ color: 'text.secondary' }}>Gestão de fluxo operacional e faturamento.</Typography>
         </Box>
-        <Button variant="contained" size="large" onClick={() => handleOpenWorkspace()} sx={{ borderRadius: 3, fontWeight: 800, px: 4 }}>NOVA OS</Button>
+        <Button variant="contained" size="large" onClick={() => handleOpenWorkspace()} sx={{ height: 52, borderRadius: 3, px: 4 }}>NOVA OS</Button>
       </Stack>
 
       <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 4, border: '1px solid', borderColor: '#E2E8F0' }}>
         <Table>
           <TableHead sx={{ bgcolor: '#F8FAFC' }}>
             <TableRow>
-              <TableCell sx={{ fontWeight: 800, color: '#64748B', fontSize: '0.75rem', letterSpacing: '0.5px' }}>VEÍCULO & CLIENTE</TableCell>
-              <TableCell sx={{ fontWeight: 800, color: '#64748B', fontSize: '0.75rem', letterSpacing: '0.5px' }}>ENTRADA</TableCell>
-              <TableCell sx={{ fontWeight: 800, color: '#64748B', fontSize: '0.75rem', letterSpacing: '0.5px' }}>STATUS</TableCell>
-              <TableCell align="right" sx={{ fontWeight: 800, color: '#64748B', fontSize: '0.75rem', letterSpacing: '0.5px' }}>VALOR</TableCell>
-              <TableCell align="center" sx={{ fontWeight: 800, color: '#64748B', fontSize: '0.75rem', letterSpacing: '0.5px' }}>AÇÕES</TableCell>
+              <TableCell sx={{ py: 2.5 }}><Typography variant="overline" sx={{ color: 'text.disabled' }}>VEÍCULO & CLIENTE</Typography></TableCell>
+              <TableCell sx={{ py: 2.5 }}><Typography variant="overline" sx={{ color: 'text.disabled' }}>ENTRADA</Typography></TableCell>
+              <TableCell sx={{ py: 2.5 }}><Typography variant="overline" sx={{ color: 'text.disabled' }}>STATUS</Typography></TableCell>
+              <TableCell align="right" sx={{ py: 2.5 }}><Typography variant="overline" sx={{ color: 'text.disabled' }}>VALOR</Typography></TableCell>
+              <TableCell align="center" sx={{ py: 2.5 }}><Typography variant="overline" sx={{ color: 'text.disabled' }}>AÇÕES</Typography></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {ordens.map((o) => {
-              const v = veiculos.find(v => v.id === o.veiculoId);
-              const style = getStatusStyle(o.status);
-              return (
-                <TableRow key={o.id} hover sx={{ '&:hover': { bgcolor: '#F1F5F9' } }}>
-                  <TableCell>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>{v?.marca} {v?.modelo} • {v?.placa}</Typography>
-                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>{getClienteNome(v?.clienteId || '')}</Typography>
-                  </TableCell>
-                  <TableCell><Typography variant="body2" sx={{ fontWeight: 700 }}>{dayjs(o.dataEntrada).format('DD/MM/YY')}</Typography></TableCell>
-                  <TableCell>
-                    <Chip label={o.status} size="small" sx={{ fontWeight: 800, borderRadius: 2, bgcolor: style.bg, color: style.color, borderLeft: `3px solid ${style.border}`, fontSize: '0.7rem' }} />
-                  </TableCell>
-                  <TableCell align="right"><Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#0F172A' }}>R$ {o.valorTotal.toFixed(2)}</Typography></TableCell>
-                  <TableCell align="center">
-                    <IconButton size="small" onClick={(e) => { setAnchorEl(e.currentTarget); setSelectedOrdem(o); }}><MoreVertIcon fontSize="small" /></IconButton>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+            {loading ? (
+              <TableRow><TableCell colSpan={5} align="center" sx={{ py: 8 }}><CircularProgress /></TableCell></TableRow>
+            ) : ordens.length === 0 ? (
+              <TableRow><TableCell colSpan={5} align="center" sx={{ py: 8 }}>Nenhuma OS encontrada.</TableCell></TableRow>
+            ) : (
+              ordens.map((o) => {
+                const v = veiculos.find(v => v.id === o.veiculoId);
+                const style = getStatusStyle(o.status);
+                return (
+                  <TableRow key={o.id} hover sx={{ '&:hover': { bgcolor: '#F8FAFC' } }}>
+                    <TableCell sx={{ py: 2 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Avatar sx={{ bgcolor: '#F1F5F9', color: 'primary.main', borderRadius: 2, width: 44, height: 44 }}><DirectionsCarIcon fontSize="small" /></Avatar>
+                        <Box>
+                          <Typography variant="subtitle2" sx={{ color: 'text.primary', mb: 0.25 }}>{v?.marca} {v?.modelo} • {v?.placa}</Typography>
+                          <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>{getClienteNome(v?.clienteId || '')}</Typography>
+                        </Box>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 600 }}>{dayjs(o.dataEntrada).format('DD MMM YYYY')}</Typography>
+                      <Typography variant="caption" sx={{ color: 'text.disabled' }}>{dayjs(o.dataEntrada).fromNow()}</Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Chip label={o.status} size="small" sx={{ height: 24, fontSize: '0.65rem', bgcolor: style.bg, color: style.color, borderLeft: `3px solid ${style.border}` }} />
+                    </TableCell>
+                    <TableCell align="right">
+                      <Typography variant="subtitle1" sx={{ color: 'primary.main', fontWeight: 900 }}>R$ {o.valorTotal.toFixed(2)}</Typography>
+                    </TableCell>
+                    <TableCell align="center">
+                      <IconButton size="small" onClick={(e) => { setAnchorEl(e.currentTarget); setSelectedOrdem(o); }}><MoreVertIcon fontSize="small" /></IconButton>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
           </TableBody>
         </Table>
       </TableContainer>
 
+      {/* OVERDRIVE: Ticket Workspace */}
       <Dialog fullScreen open={workspaceOpen} onClose={() => setWorkspaceOpen(false)}>
         <Grid container sx={{ height: '100vh' }}>
+          {/* Left: Search & Catalog */}
           <Grid item xs={12} md={8} sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: 'white' }}>
-            <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: '#E2E8F0', display: 'flex', alignItems: 'center', gap: 2 }}>
-              <IconButton onClick={() => setWorkspaceOpen(false)} sx={{ bgcolor: '#F1F5F9' }}><CloseIcon /></IconButton>
-              <Paper elevation={0} sx={{ flex: 1, bgcolor: '#F1F5F9', borderRadius: 4, px: 2, display: 'flex', alignItems: 'center' }}>
-                <SearchIcon sx={{ color: '#64748B', mr: 1 }} />
-                <InputBase fullWidth autoFocus placeholder="DIGITE PLACA, SERVIÇO OU PEÇA..." value={workspaceSearch} onChange={(e) => setWorkspaceSearch(e.target.value)} sx={{ py: 1.5, fontSize: '1.1rem', fontWeight: 800 }} />
+            <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: '#E2E8F0', display: 'flex', alignItems: 'center', gap: 3 }}>
+              <IconButton onClick={() => setWorkspaceOpen(false)} sx={{ bgcolor: '#F1F5F9' }}><CloseIcon fontSize="small" /></IconButton>
+              <Paper elevation={0} sx={{ flex: 1, bgcolor: '#F1F5F9', borderRadius: 4, px: 2.5, display: 'flex', alignItems: 'center' }}>
+                <SearchIcon sx={{ color: 'text.disabled', mr: 1.5 }} />
+                <InputBase fullWidth autoFocus placeholder="DIGITE PLACA, SERVIÇO OU PEÇA..." value={workspaceSearch} onChange={(e) => setWorkspaceSearch(e.target.value)} sx={{ py: 2, fontSize: '1.125rem', fontWeight: 800, color: 'text.primary' }} />
               </Paper>
             </Box>
-            <Box sx={{ flex: 1, overflowY: 'auto', p: 4 }}>
-              <Typography variant="overline" sx={{ fontWeight: 900, color: '#94A3B8', mb: 3, display: 'block' }}>CATÁLOGO MICHELIN</Typography>
-              <Grid container spacing={2}>
+            <Box sx={{ flex: 1, overflowY: 'auto', p: 5 }}>
+              <Typography variant="overline" sx={{ color: 'text.disabled', mb: 4, display: 'block', letterSpacing: '0.15em' }}>CATÁLOGO MICHELIN</Typography>
+              <Grid container spacing={3}>
                 {catalogoMisto.slice(0, 16).map((item) => (
                   <Grid item xs={6} sm={4} lg={3} key={`${item.type}-${item.id}`}>
-                    <Card elevation={0} sx={{ borderRadius: 4, border: '1px solid', borderColor: '#E2E8F0', transition: 'all 0.2s', '&:hover': { borderColor: '#002D72', boxShadow: '0 8px 30px rgba(0,45,114,0.06)', transform: 'translateY(-2px)' } }}>
-                      <CardActionArea sx={{ p: 2.5 }} onClick={() => setTicketItems(p => [...p, { ...item, uid: Math.random() }])}>
-                        <Avatar sx={{ bgcolor: item.type === 'servico' ? '#D1FAE5' : '#E0F2FE', color: item.type === 'servico' ? '#065F46' : '#0369A1', mb: 2, borderRadius: 2.5 }}>
+                    <Card elevation={0} sx={{ borderRadius: 4, border: '1px solid', borderColor: '#E2E8F0', transition: 'all 0.2s', '&:hover': { borderColor: 'primary.main', boxShadow: '0 12px 30px rgba(0,45,114,0.08)', transform: 'translateY(-4px)' } }}>
+                      <CardActionArea sx={{ p: 3 }} onClick={() => setTicketItems(p => [...p, { ...item, uid: Math.random() }])}>
+                        <Avatar sx={{ bgcolor: item.type === 'servico' ? '#D1FAE5' : '#E0F2FE', color: item.type === 'servico' ? '#065F46' : '#0369A1', mb: 2.5, borderRadius: 2.5, width: 48, height: 48 }}>
                           {item.type === 'servico' ? <BuildIcon fontSize="small" /> : <InventoryIcon fontSize="small" />}
                         </Avatar>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1 }}>{item.nome}</Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 900, color: '#002D72' }}>R$ {item.valor.toFixed(2)}</Typography>
+                        <Typography variant="subtitle2" sx={{ lineHeight: 1.3, mb: 1.5, height: 2.6 + 'em', overflow: 'hidden' }}>{item.nome}</Typography>
+                        <Typography variant="h6" sx={{ color: 'primary.main', fontWeight: 900 }}>R$ {item.valor.toFixed(2)}</Typography>
                       </CardActionArea>
                     </Card>
                   </Grid>
@@ -216,49 +235,51 @@ const OrdensServico = () => {
               </Grid>
             </Box>
           </Grid>
+          {/* Right: The Ticket */}
           <Grid item xs={12} md={4} sx={{ bgcolor: '#F8FAFC', borderLeft: '1px solid', borderColor: '#E2E8F0', display: 'flex', flexDirection: 'column' }}>
-            <Box sx={{ p: 4, flex: 1, overflowY: 'auto' }}>
-              <Typography variant="overline" sx={{ fontWeight: 900, color: '#002D72' }}>TICKET DE ATENDIMENTO</Typography>
+            <Box sx={{ p: 5, flex: 1, overflowY: 'auto' }}>
+              <Typography variant="overline" sx={{ color: 'primary.main', mb: 3, display: 'block', letterSpacing: '0.1em' }}>TICKET DE ATENDIMENTO</Typography>
               {ticketVehicle ? (
-                <Paper elevation={0} sx={{ p: 2.5, mt: 2, borderRadius: 4, bgcolor: '#002D72', color: 'white' }}>
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.2)', borderRadius: 2 }}><DirectionsCarIcon /></Avatar>
+                <Paper elevation={0} sx={{ p: 3, mt: 2, borderRadius: 4, bgcolor: 'primary.main', color: 'white', boxShadow: '0 12px 30px rgba(0,45,114,0.25)' }}>
+                  <Stack direction="row" spacing={2.5} alignItems="center">
+                    <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.2)', borderRadius: 2.5, width: 52, height: 52 }}><DirectionsCarIcon /></Avatar>
                     <Box sx={{ flex: 1 }}>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 900 }}>{ticketVehicle.marca} {ticketVehicle.modelo}</Typography>
-                      <Typography variant="caption" sx={{ fontWeight: 800, opacity: 0.9 }}>PLACA: {ticketVehicle.placa}</Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 900, lineHeight: 1.2 }}>{ticketVehicle.marca} {ticketVehicle.modelo}</Typography>
+                      <Typography variant="overline" sx={{ opacity: 0.8, fontWeight: 800 }}>PLACA: {ticketVehicle.placa}</Typography>
                     </Box>
                     <IconButton size="small" onClick={() => setTicketVehicle(null)} sx={{ color: 'white' }}><CloseIcon fontSize="small" /></IconButton>
                   </Stack>
                 </Paper>
               ) : (
-                <Box sx={{ mt: 2, p: 4, border: '2px dashed', borderColor: '#CBD5E1', borderRadius: 4, textAlign: 'center', bgcolor: 'white' }}>
-                  <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 800 }}>Vincule um Veículo</Typography>
+                <Box sx={{ mt: 2, p: 5, border: '2px dashed', borderColor: '#CBD5E1', borderRadius: 4, textAlign: 'center', bgcolor: 'white' }}>
+                  <Typography variant="subtitle2" sx={{ color: 'text.secondary' }}>Vincule um Veículo</Typography>
+                  <Typography variant="caption" sx={{ color: 'text.disabled', mt: 1, display: 'block' }}>Digite a placa na busca para anexar.</Typography>
                 </Box>
               )}
-              <List sx={{ mt: 4 }}>
+              <List sx={{ mt: 5 }}>
                 {ticketItems.map((item) => (
-                  <ListItem key={item.uid} disableGutters sx={{ mb: 2, px: 2, bgcolor: 'white', borderRadius: 3, border: '1px solid', borderColor: '#E2E8F0' }}>
-                    <Avatar sx={{ width: 36, height: 36, mr: 2, bgcolor: '#F1F5F9', color: '#64748B', borderRadius: 1.5 }}>
-                      {item.type === 'servico' ? <BuildIcon sx={{ fontSize: 16 }} /> : <InventoryIcon sx={{ fontSize: 16 }} />}
+                  <ListItem key={item.uid} disableGutters sx={{ mb: 2.5, px: 2.5, py: 2, bgcolor: 'white', borderRadius: 4, border: '1px solid', borderColor: '#E2E8F0', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                    <Avatar sx={{ width: 40, height: 40, mr: 2.5, bgcolor: '#F1F5F9', color: 'text.secondary', borderRadius: 2 }}>
+                      {item.type === 'servico' ? <BuildIcon sx={{ fontSize: 18 }} /> : <InventoryIcon sx={{ fontSize: 18 }} />}
                     </Avatar>
-                    <ListItemText primary={item.nome} primaryTypographyProps={{ variant: 'subtitle2', fontWeight: 800 }} />
-                    <Stack alignItems="flex-end">
-                      <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#002D72' }}>R$ {item.valor.toFixed(2)}</Typography>
-                      <IconButton size="small" color="error" onClick={() => setTicketItems(p => p.filter(i => i.uid !== item.uid))}><DeleteOutlineIcon fontSize="small" /></IconButton>
+                    <ListItemText primary={item.nome} primaryTypographyProps={{ variant: 'subtitle2', sx: { color: 'text.primary', lineHeight: 1.2 } }} />
+                    <Stack alignItems="flex-end" sx={{ ml: 2 }}>
+                      <Typography variant="subtitle1" sx={{ color: 'primary.main', fontWeight: 900 }}>R$ {item.valor.toFixed(2)}</Typography>
+                      <IconButton size="small" color="error" onClick={() => setTicketItems(p => p.filter(i => i.uid !== item.uid))} sx={{ mt: 0.5 }}><DeleteOutlineIcon fontSize="small" /></IconButton>
                     </Stack>
                   </ListItem>
                 ))}
               </List>
-              <TextField fullWidth placeholder="Observações técnicas..." multiline rows={3} value={descricao} onChange={(e) => setDescricao(e.target.value)} sx={{ mt: 2, '& .MuiOutlinedInput-root': { borderRadius: 4, bgcolor: 'white' } }} />
+              <TextField fullWidth placeholder="Observações técnicas..." multiline rows={4} value={descricao} onChange={(e) => setDescricao(e.target.value)} sx={{ mt: 3, '& .MuiOutlinedInput-root': { borderRadius: 4, bgcolor: 'white', py: 2 } }} />
             </Box>
-            <Paper elevation={0} sx={{ p: 4, borderRadius: '40px 40px 0 0', borderTop: '1px solid', borderColor: '#E2E8F0', bgcolor: 'white' }}>
-              <Stack direction="row" justifyContent="space-between" mb={4} alignItems="center">
-                <Typography variant="h6" sx={{ fontWeight: 800, color: '#64748B' }}>Total</Typography>
-                <Typography variant="h3" sx={{ fontWeight: 900, color: '#002D72', letterSpacing: '-2px' }}>R$ {liveTotal.toFixed(2)}</Typography>
+            <Paper elevation={0} sx={{ p: 5, borderRadius: '40px 40px 0 0', borderTop: '1px solid', borderColor: '#E2E8F0', bgcolor: 'white', boxShadow: '0 -10px 40px rgba(0,0,0,0.04)' }}>
+              <Stack direction="row" justifyContent="space-between" mb={5} alignItems="center">
+                <Typography variant="h6" sx={{ color: 'text.secondary' }}>Total</Typography>
+                <Typography variant="h2" sx={{ color: 'primary.main', letterSpacing: '-0.04em' }}>R$ {liveTotal.toFixed(2)}</Typography>
               </Stack>
-              <Stack direction="row" spacing={2}>
-                <Button fullWidth variant="outlined" size="large" onClick={() => handleSaveOS('Aguardando aprovação')} sx={{ borderRadius: 3, fontWeight: 900, height: 60, borderWidth: 2 }}>ORÇAMENTO</Button>
-                <Button fullWidth variant="contained" size="large" onClick={() => handleSaveOS('Em andamento')} disabled={!ticketVehicle} sx={{ borderRadius: 3, fontWeight: 900, height: 60, bgcolor: '#059669', '&:hover': { bgcolor: '#047857' } }}>INICIAR</Button>
+              <Stack direction="row" spacing={3}>
+                <Button fullWidth variant="outlined" size="large" onClick={() => handleSaveOS('Aguardando aprovação')} sx={{ borderRadius: 3.5, height: 64, borderWidth: 2, '&:hover': { borderWidth: 2 } }}>ORÇAMENTO</Button>
+                <Button fullWidth variant="contained" size="large" onClick={() => handleSaveOS('Em andamento')} disabled={!ticketVehicle} sx={{ borderRadius: 3.5, height: 64, bgcolor: 'success.main', '&:hover': { bgcolor: 'success.dark' } }}>INICIAR</Button>
               </Stack>
             </Paper>
           </Grid>

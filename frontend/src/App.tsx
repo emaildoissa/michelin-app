@@ -47,16 +47,20 @@ const theme = createTheme(
       borderRadius: 14 // Softer, modern look
     },
     typography: {
-      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
-      h1: { fontWeight: 900 },
-      h2: { fontWeight: 800 },
-      h3: { fontWeight: 800 },
-      h4: { fontWeight: 800 },
-      h5: { fontWeight: 700 },
-      h6: { fontWeight: 700 },
-      subtitle1: { fontWeight: 600 },
-      subtitle2: { fontWeight: 600 },
-      button: { textTransform: 'none', fontWeight: 800 }
+      fontFamily: '"Inter", "system-ui", "-apple-system", sans-serif',
+      h1: { fontSize: '2.5rem', fontWeight: 900, lineHeight: 1.1, letterSpacing: '-0.02em' },
+      h2: { fontSize: '2rem', fontWeight: 800, lineHeight: 1.2, letterSpacing: '-0.01em' },
+      h3: { fontSize: '1.5rem', fontWeight: 800, lineHeight: 1.3 },
+      h4: { fontSize: '1.25rem', fontWeight: 700, lineHeight: 1.4 },
+      h5: { fontSize: '1.125rem', fontWeight: 700, lineHeight: 1.5 },
+      h6: { fontSize: '1rem', fontWeight: 700, lineHeight: 1.5 },
+      body1: { fontSize: '1rem', fontWeight: 400, lineHeight: 1.6 },
+      body2: { fontSize: '0.875rem', fontWeight: 500, lineHeight: 1.5 },
+      subtitle1: { fontSize: '1rem', fontWeight: 600, lineHeight: 1.5 },
+      subtitle2: { fontSize: '0.875rem', fontWeight: 700, lineHeight: 1.4 },
+      caption: { fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' },
+      overline: { fontSize: '0.625rem', fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase' },
+      button: { fontSize: '0.875rem', fontWeight: 800, textTransform: 'none', letterSpacing: '0.02em' }
     },
     components: {
       MuiButton: {

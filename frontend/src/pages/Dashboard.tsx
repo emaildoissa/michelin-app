@@ -80,7 +80,10 @@ const Dashboard = () => {
     <Box sx={{ pb: 8 }}>
       {/* OVERDRIVE: Command Center Header */}
       <Box sx={{ mb: 6 }}>
-        <Typography variant="h4" sx={{ fontWeight: 900, color: 'primary.main', mb: 3 }}>
+        <Typography variant="overline" sx={{ color: 'text.secondary', mb: 1, display: 'block' }}>
+          Gestão de Atendimento
+        </Typography>
+        <Typography variant="h2" sx={{ color: 'primary.main', mb: 3 }}>
           CENTRAL DE COMANDO
         </Typography>
         <Paper 
@@ -100,7 +103,7 @@ const Dashboard = () => {
         >
           <Avatar sx={{ bgcolor: 'primary.main', mr: 2 }}><SearchIcon /></Avatar>
           <InputBase
-            sx={{ flex: 1, fontSize: '1.2rem', fontWeight: 700 }}
+            sx={{ flex: 1, fontSize: '1.125rem', fontWeight: 700 }}
             placeholder="Digite uma PLACA para iniciar um atendimento rápido..."
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
@@ -112,7 +115,7 @@ const Dashboard = () => {
             variant="contained" 
             size="large" 
             onClick={() => navigate('/ordens', { state: { openInstant: true } })}
-            sx={{ borderRadius: 4, px: 4, fontWeight: 800 }}
+            sx={{ borderRadius: 4, px: 4, py: 1.5 }}
           >
             NOVA OS
           </Button>
@@ -126,7 +129,7 @@ const Dashboard = () => {
             <Paper 
               elevation={0}
               sx={{ 
-                p: 4, 
+                p: 5, 
                 bgcolor: 'primary.main', 
                 color: 'primary.contrastText', 
                 borderRadius: 4,
@@ -136,44 +139,48 @@ const Dashboard = () => {
             >
               <Stack direction={{ xs: 'column', md: 'row' }} spacing={4} alignItems="center" sx={{ position: 'relative', zIndex: 1 }}>
                 <Box sx={{ flex: 1 }}>
-                  <Typography variant="overline" sx={{ fontWeight: 800, opacity: 0.8, letterSpacing: 2 }}>STATUS OPERACIONAL</Typography>
-                  <Typography variant="h1" sx={{ fontWeight: 900, mb: 1 }}>{ordensAtivas}</Typography>
-                  <Typography variant="h6" sx={{ fontWeight: 500, opacity: 0.9 }}>Veículos sendo atendidos agora</Typography>
+                  <Typography variant="overline" sx={{ opacity: 0.8, fontWeight: 900, letterSpacing: '0.15em' }}>STATUS OPERACIONAL</Typography>
+                  <Typography variant="h1" sx={{ mt: 1, mb: 0.5 }}>{ordensAtivas}</Typography>
+                  <Typography variant="h6" sx={{ opacity: 0.9, fontWeight: 500 }}>Veículos sendo atendidos agora</Typography>
                 </Box>
-                <Stack direction="row" spacing={2}>
-                  <Box sx={{ p: 2, borderRadius: 3, bgcolor: 'rgba(255,255,255,0.1)', minWidth: 100, textAlign: 'center' }}>
-                    <Typography variant="h5" sx={{ fontWeight: 900 }}>{totalClientes}</Typography>
-                    <Typography variant="caption" sx={{ fontWeight: 700, opacity: 0.7 }}>CLIENTES</Typography>
+                <Stack direction="row" spacing={3}>
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Typography variant="h3" sx={{ fontWeight: 900 }}>{totalClientes}</Typography>
+                    <Typography variant="caption" sx={{ opacity: 0.7, fontWeight: 800 }}>CLIENTES</Typography>
                   </Box>
-                  <Box sx={{ p: 2, borderRadius: 3, bgcolor: 'rgba(255,255,255,0.1)', minWidth: 100, textAlign: 'center' }}>
-                    <Typography variant="h5" sx={{ fontWeight: 900 }}>{totalVeiculos}</Typography>
-                    <Typography variant="caption" sx={{ fontWeight: 700, opacity: 0.7 }}>VEÍCULOS</Typography>
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Typography variant="h3" sx={{ fontWeight: 900 }}>{totalVeiculos}</Typography>
+                    <Typography variant="caption" sx={{ opacity: 0.7, fontWeight: 800 }}>VEÍCULOS</Typography>
                   </Box>
                 </Stack>
               </Stack>
-              <BuildCircleIcon sx={{ position: 'absolute', right: -40, bottom: -40, fontSize: 240, opacity: 0.05, transform: 'rotate(-20deg)' }} />
+              <BuildCircleIcon sx={{ position: 'absolute', right: -40, bottom: -40, fontSize: 280, opacity: 0.05, transform: 'rotate(-20deg)' }} />
             </Paper>
 
             <Box>
-              <Typography variant="h6" sx={{ mb: 3, fontWeight: 900, display: 'flex', alignItems: 'center', gap: 1 }}>
-                <AssignmentIcon color="primary" /> ATIVIDADES EM ANDAMENTO
+              <Typography variant="h5" sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <AssignmentIcon color="primary" fontSize="small" /> ATIVIDADES EM ANDAMENTO
               </Typography>
-              <Grid container spacing={2}>
+              <Grid container spacing={3}>
                 {ordensRecentes.map((ordem) => {
                   const veiculo = veiculos.find(v => v.id === ordem.veiculoId);
                   return (
                     <Grid item xs={12} sm={6} key={ordem.id}>
-                      <Card elevation={0} sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider', '&:hover': { borderColor: 'primary.main' } }}>
+                      <Card elevation={0} sx={{ borderRadius: 4, border: '1px solid', borderColor: '#E2E8F0', transition: 'border-color 0.2s', '&:hover': { borderColor: 'primary.main' } }}>
                         <CardContent sx={{ p: 3 }}>
-                          <Stack direction="row" justifyContent="space-between" mb={2}>
-                            <Chip label={ordem.status} size="small" sx={{ fontWeight: 800, borderRadius: 1.5, bgcolor: 'primary.50', color: 'primary.main' }} />
-                            <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.disabled' }}>OS #{ordem.id.slice(-6).toUpperCase()}</Typography>
+                          <Stack direction="row" justifyContent="space-between" mb={3}>
+                            <Chip label={ordem.status} size="small" sx={{ height: 24, fontSize: '0.65rem', px: 0.5 }} />
+                            <Typography variant="overline" sx={{ color: 'text.disabled' }}>OS #{ordem.id.slice(-6)}</Typography>
                           </Stack>
-                          <Typography variant="h6" sx={{ fontWeight: 800 }}>{veiculo?.marca} {veiculo?.modelo}</Typography>
-                          <Typography variant="body2" color="text.secondary" gutterBottom>{veiculo?.placa}</Typography>
-                          <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <Typography variant="caption" sx={{ fontWeight: 700 }}>{new Date(ordem.dataEntrada).toLocaleDateString('pt-BR')}</Typography>
-                            <Typography variant="subtitle1" sx={{ fontWeight: 900, color: 'primary.main' }}>R$ {ordem.valorTotal.toFixed(2)}</Typography>
+                          <Typography variant="h6" sx={{ mb: 0.5 }}>{veiculo?.marca} {veiculo?.modelo}</Typography>
+                          <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>{veiculo?.placa}</Typography>
+                          <Divider sx={{ my: 2.5, borderStyle: 'dashed' }} />
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                            <Box>
+                              <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block', mb: 0.5 }}>DATA ENTRADA</Typography>
+                              <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>{new Date(ordem.dataEntrada).toLocaleDateString('pt-BR')}</Typography>
+                            </Box>
+                            <Typography variant="h5" sx={{ color: 'primary.main', fontWeight: 900 }}>R$ {ordem.valorTotal.toFixed(2)}</Typography>
                           </Box>
                         </CardContent>
                       </Card>
@@ -188,21 +195,26 @@ const Dashboard = () => {
         <Grid item xs={12} lg={4}>
           <Stack spacing={4}>
             <Paper elevation={0} sx={{ p: 4, borderRadius: 4, bgcolor: 'secondary.main', color: 'secondary.contrastText' }}>
-              <Typography variant="overline" sx={{ fontWeight: 900, opacity: 0.8 }}>RECEITA TOTAL</Typography>
-              <Typography variant="h3" sx={{ fontWeight: 900, mb: 1 }}>R$ {faturamentoTotal.toFixed(2)}</Typography>
-              <Typography variant="body2" sx={{ opacity: 0.9 }}>Volume total processado em serviços finalizados e orçamentos.</Typography>
-              <Button variant="contained" sx={{ mt: 3, bgcolor: 'white', color: 'black', fontWeight: 800, '&:hover': { bgcolor: 'grey.100' } }} fullWidth>
+              <Typography variant="overline" sx={{ opacity: 0.8, fontWeight: 900 }}>RECEITA TOTAL</Typography>
+              <Typography variant="h2" sx={{ mt: 1, mb: 1.5, letterSpacing: '-0.03em' }}>R$ {faturamentoTotal.toFixed(2)}</Typography>
+              <Typography variant="body2" sx={{ opacity: 0.9, lineHeight: 1.5 }}>Volume total processado em serviços finalizados e orçamentos.</Typography>
+              <Button variant="contained" sx={{ mt: 4, bgcolor: 'white', color: 'black', '&:hover': { bgcolor: '#F1F5F9' } }} fullWidth>
                 RELATÓRIO COMPLETO
               </Button>
             </Paper>
 
-            <Paper elevation={0} sx={{ p: 4, borderRadius: 4, border: '1px solid', borderColor: 'divider' }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 900, mb: 3 }}>CLIENTES RECENTES</Typography>
+            <Paper elevation={0} sx={{ p: 4, borderRadius: 4 }}>
+              <Typography variant="subtitle2" sx={{ mb: 3, letterSpacing: '0.05em' }}>CLIENTES RECENTES</Typography>
               <List disablePadding>
                 {clientes.slice(0, 3).map((cliente) => (
-                  <ListItem key={cliente.id} disableGutters sx={{ py: 1.5 }}>
-                    <Avatar sx={{ mr: 2, bgcolor: 'grey.100', color: 'text.secondary' }}><PeopleIcon /></Avatar>
-                    <ListItemText primary={cliente.nome} primaryTypographyProps={{ variant: 'subtitle2', fontWeight: 800 }} secondary="Cliente desde o registro" />
+                  <ListItem key={cliente.id} disableGutters sx={{ py: 2 }}>
+                    <Avatar sx={{ mr: 2, bgcolor: '#F1F5F9', color: 'text.secondary', width: 40, height: 40 }}><PeopleIcon fontSize="small" /></Avatar>
+                    <ListItemText 
+                      primary={cliente.nome} 
+                      primaryTypographyProps={{ variant: 'subtitle2', sx: { color: 'text.primary' } }} 
+                      secondary="Cliente registrado recentemente"
+                      secondaryTypographyProps={{ variant: 'caption', sx: { color: 'text.disabled' } }}
+                    />
                   </ListItem>
                 ))}
               </List>
