@@ -6,12 +6,14 @@ import pool from './db.js';
 dotenv.config();
 
 const app: Express = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5002;
 
 // Middlewares
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:8080',
-  credentials: true,
+  // Adicionamos a 5174 explicitamente
+  origin: ['http://localhost:5173', 'http://localhost:5174'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -665,18 +667,7 @@ app.use((req: Request, res: Response) => {
   res.status(404).json({ status: 'ERRO', message: 'Rota não encontrada', path: req.path });
 });
 
-app.listen(PORT, () => {
-  console.log(`✅ Servidor rodando em http://localhost:${PORT}`);
-  console.log(`📋 Rotas disponíveis:`);
-  console.log(`   GET/POST           /clientes`);
-  console.log(`   PUT/DELETE         /clientes/:id`);
-  console.log(`   GET/POST           /veiculos`);
-  console.log(`   PUT/DELETE         /veiculos/:id`);
-  console.log(`   GET/POST           /servicos`);
-  console.log(`   PUT/DELETE         /servicos/:id`);
-  console.log(`   GET/POST           /pecas`);
-  console.log(`   PUT/DELETE         /pecas/:id`);
-  console.log(`   GET/POST           /ordens_servico`);
-  console.log(`   PUT/DELETE         /ordens_servico/:id`);
-  console.log(`   GET                /api/health`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => console.log(`Server on ${PORT}`));
+}
+export default app;

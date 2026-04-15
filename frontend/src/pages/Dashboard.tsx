@@ -25,6 +25,7 @@ import {
 } from '@mui/icons-material';
 import api from '../services/api';
 
+
 interface DashboardStats {
   osAbertas: number;
   faturamentoMensal: number;
