@@ -308,15 +308,7 @@ app.delete('/servicos/:id', async (req: Request, res: Response) => {
 // ============================================================
 // --- ROTAS DE PEÇAS ---
 // ============================================================
-app.get('/pecas', async (_req: Request, res: Response) => {
-  try {
-    const result = await pool.query('SELECT * FROM pecas WHERE ativo = true ORDER BY nome');
-    res.json(result.rows.map(pecaToFrontend));
-  } catch (error) {
-    console.error('GET /pecas erro:', error);
-    res.status(500).json({ error: (error as Error).message });
-  }
-});
+
 
 app.post('/pecas', async (req: Request, res: Response) => {
   const { nome, codigo, marca, preco, quantidade, modeloCompativel } = req.body;
@@ -383,7 +375,7 @@ app.get('/ordens_servico', async (_req: Request, res: Response) => {
   }
 });
 
-app.post('/ordens_servico', async (req: Request, res: Response) => {
+/* app.post('/ordens_servico', async (req: Request, res: Response) => {
   const veiculoId = req.body.veiculoId || req.body.veiculo_id;
   const { descricao, status, valorTotal, servicosIds, pecasIds } = req.body;
 
@@ -434,9 +426,72 @@ app.post('/ordens_servico', async (req: Request, res: Response) => {
   } finally {
     client.release();
   }
+}); */
+
+app.post('/ordens_servico', async (req: Request, res: Response) => {
+  const { veiculoId, descricao, status, servicosIds, pecasIds } = req.body;
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    // 1. Calcular totais
+    let totalServicos = 0;
+    let totalPecas = 0;
+
+    // 2. Inserir Ordem Base
+    const ordemRes = await client.query(
+      'INSERT INTO ordens_servico (veiculo_id, descricao_problema, status) VALUES ($1, $2, $3) RETURNING id',
+      [veiculoId, descricao, status || 'Aguardando aprovação']
+    );
+    const ordemId = ordemRes.rows[0].id;
+
+    // 3. Vincular e somar Serviços
+    if (servicosIds?.length) {
+      for (const sId of servicosIds) {
+        const sRes = await client.query('SELECT valor FROM servicos WHERE id = $1', [sId]);
+        const valor = parseFloat(sRes.rows[0].valor);
+        totalServicos += valor;
+        await client.query(
+          'INSERT INTO ordem_servico_servicos (ordem_id, servico_id, valor_unitario, valor_total) VALUES ($1, $2, $3, $4)',
+          [ordemId, sId, valor, valor]
+        );
+      }
+    }
+
+    // 4. Vincular, somar e validar Peças
+    if (pecasIds?.length) {
+      for (const pId of pecasIds) {
+        const pRes = await client.query('SELECT preco, quantidade FROM pecas WHERE id = $1', [pId]);
+        if (pRes.rows[0].quantidade <= 0) {
+          throw new Error(`Peça ${pId} sem estoque disponível.`);
+        }
+        const preco = parseFloat(pRes.rows[0].preco);
+        totalPecas += preco;
+        await client.query(
+          'INSERT INTO ordem_servico_pecas (ordem_id, peca_id, valor_unitario, valor_total) VALUES ($1, $2, $3, $4)',
+          [ordemId, pId, preco, preco]
+        );
+      }
+    }
+
+    // 5. Atualizar total final da OS
+    await client.query(
+      'UPDATE ordens_servico SET valor_total = $1 WHERE id = $2',
+      [totalServicos + totalPecas, ordemId]
+    );
+
+    await client.query('COMMIT');
+    res.status(201).json({ id: ordemId, total: totalServicos + totalPecas });
+  } catch (error) {
+    await client.query('ROLLBACK');
+    res.status(400).json({ error: (error as Error).message });
+  } finally {
+    client.release();
+  }
 });
 
-app.put('/ordens_servico/:id', async (req: Request, res: Response) => {
+/* app.put('/ordens_servico/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
   const veiculoId = req.body.veiculoId || req.body.veiculo_id;
   const { descricao, status, valorTotal, servicosIds, pecasIds } = req.body;
@@ -495,6 +550,52 @@ app.put('/ordens_servico/:id', async (req: Request, res: Response) => {
   } finally {
     client.release();
   }
+}); */
+
+// backend/src/server.ts -> Modificando o PUT de Ordens de Serviço
+
+app.put('/ordens_servico/:id', async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { status, servicosIds, pecasIds, descricao } = req.body;
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    // 1. Verificar o estado atual da OS antes de atualizar
+    const osAtual = await client.query('SELECT status FROM ordens_servico WHERE id = $1', [id]);
+
+    // 2. Atualizar a OS (incluindo data de conclusão se for finalizada)
+    const dataConclusao = (status === 'Concluída') ? new Date() : null;
+
+    const result = await client.query(
+      `UPDATE ordens_servico 
+       SET status = $1, data_conclusao = $2, descricao_problema = $3
+       WHERE id = $4 RETURNING *`,
+      [status, dataConclusao, descricao, id]
+    );
+
+    // 3. LÓGICA ERP: Se acabou de ser concluída, baixar estoque
+    if (status === 'Concluída' && osAtual.rows[0].status !== 'Concluída') {
+      if (pecasIds && pecasIds.length > 0) {
+        for (const pId of pecasIds) {
+          // Diminui 1 unidade de cada peça usada (pode ser expandido para quantidade variável)
+          await client.query(
+            'UPDATE pecas SET quantidade = quantidade - 1 WHERE id = $1 AND quantidade > 0',
+            [pId]
+          );
+        }
+      }
+    }
+
+    await client.query('COMMIT');
+    res.json(result.rows[0]);
+  } catch (error) {
+    await client.query('ROLLBACK');
+    res.status(500).json({ error: (error as Error).message });
+  } finally {
+    client.release();
+  }
 });
 
 app.delete('/ordens_servico/:id', async (req: Request, res: Response) => {
@@ -509,6 +610,45 @@ app.delete('/ordens_servico/:id', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('DELETE /ordens_servico erro:', error);
     res.status(500).json({ error: (error as Error).message });
+  }
+});
+
+// Rota para buscar apenas peças com estoque crítico (abaixo do mínimo)
+app.get('/pecas/criticas', async (_req: Request, res: Response) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM pecas WHERE quantidade <= quantidade_minima AND ativo = true ORDER BY quantidade ASC'
+    );
+    res.json(result.rows.map(pecaToFrontend)); // Usa sua função auxiliar clienteToFrontend adaptada
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
+
+// backend/src/server.ts
+
+app.get('/pecas', async (req: Request, res: Response) => {
+  const { busca } = req.query; // Pega o termo de busca da URL
+
+  try {
+    let queryText = 'SELECT * FROM pecas WHERE ativo = true';
+    const queryParams: any[] = [];
+
+    // Se houver busca, adicionamos o filtro com segurança contra SQL Injection
+    if (busca && busca !== '') {
+      queryText += ' AND (nome ILIKE $1 OR codigo ILIKE $1 OR marca ILIKE $1)';
+      queryParams.push(`%${busca}%`);
+    }
+
+    queryText += ' ORDER BY nome';
+
+    const result = await pool.query(queryText, queryParams);
+
+    // Importante: Verifique se todos os campos existem antes de mapear
+    res.json(result.rows.map(pecaToFrontend));
+  } catch (error) {
+    console.error('ERRO CRÍTICO NO BACKEND:', error);
+    res.status(500).json({ error: 'Erro interno ao buscar peças' });
   }
 });
 

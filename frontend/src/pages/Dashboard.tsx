@@ -1,225 +1,212 @@
-import { Box, Grid, Paper, Typography, Card, CardContent, List, ListItem, ListItemText, Divider, Chip, Button, Fab, Stack, Avatar, InputBase, IconButton } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import {
+  Grid,
+  Paper,
+  Typography,
+  Box,
+  Card,
+  CardContent,
+  Divider,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Chip,
+  CircularProgress
+} from '@mui/material';
+import {
+  Build as BuildIcon,
+  AttachMoney as MoneyIcon,
+  People as PeopleIcon,
+  Inventory as InventoryIcon,
+  DirectionsCar as CarIcon
+} from '@mui/icons-material';
 import api from '../services/api';
-import AddIcon from '@mui/icons-material/Add';
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import PeopleIcon from '@mui/icons-material/People';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import BuildCircleIcon from '@mui/icons-material/BuildCircle';
-import SearchIcon from '@mui/icons-material/Search';
-import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 
-interface Cliente {
-  id: string;
-  nome: string;
+interface DashboardStats {
+  osAbertas: number;
+  faturamentoMensal: number;
+  clientesNovos: number;
+  estoqueBaixo: number;
+  recentesOS: any[];
 }
 
-interface Veiculo {
-  id: string;
-  marca: string;
-  modelo: string;
-  placa: string;
-}
-
-interface OrdemServico {
-  id: string;
-  veiculoId: string;
-  dataEntrada: string;
-  status: string;
-  valorTotal: number;
-}
-
-const Dashboard = () => {
-  const [clientes, setClientes] = useState<Cliente[]>([]);
-  const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
-  const [ordensServico, setOrdensServico] = useState<OrdemServico[]>([]);
+const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const [stats, setStats] = useState<DashboardStats>({
+    osAbertas: 0,
+    faturamentoMensal: 0,
+    clientesNovos: 0,
+    estoqueBaixo: 0,
+    recentesOS: []
+  });
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const [clientesRes, veiculosRes, ordensRes] = await Promise.all([
+        const [osRes, clientesRes, pecasRes] = await Promise.all([
+          api.get('/ordens_servico'),
           api.get('/clientes'),
-          api.get('/veiculos'),
-          api.get('/ordens_servico')
+          api.get('/pecas')
         ]);
-        setClientes(clientesRes.data);
-        setVeiculos(veiculosRes.data);
-        setOrdensServico(ordensRes.data);
-        setLoading(false);
+
+        console.log("Dados OS recebidos:", osRes.data); // Verifique o console do navegador (F12)
+
+        // Lógica de soma robusta (trata nulls e diferentes nomenclaturas)
+        const osAbertasCount = osRes.data.filter((os: any) =>
+          os.status !== 'Concluída' && os.status !== 'Finalizada'
+        ).length;
+
+        const faturamento = osRes.data
+          .filter((os: any) => os.status === 'Concluída' || os.status === 'Finalizada')
+          .reduce((acc: number, curr: any) => {
+            // Tenta pegar valor_total ou valorTotal
+            const valor = curr.valor_total || curr.valorTotal || 0;
+            return acc + Number(valor);
+          }, 0);
+
+        setStats({
+          osAbertas: osAbertasCount,
+          faturamentoMensal: faturamento,
+          clientesNovos: clientesRes.data.length,
+          estoqueBaixo: pecasRes.data.filter((p: any) => (p.quantidade || 0) < 5).length,
+          recentesOS: osRes.data.slice(0, 5) // Mostra as 5 primeiras da lista
+        });
       } catch (error) {
-        console.error('Erro ao carregar dados:', error);
+        console.error("Erro no Dashboard:", error);
+      } finally {
         setLoading(false);
       }
     };
-    fetchData();
+
+    fetchDashboardData();
   }, []);
 
-  const totalClientes = clientes.length;
-  const totalVeiculos = veiculos.length;
-  const ordensAtivas = ordensServico.filter(ordem => 
-    ['Aguardando aprovação', 'Orçamento aprovado', 'Em andamento'].includes(ordem.status)
-  ).length;
-  const faturamentoTotal = ordensServico.reduce((acc, ordem) => acc + ordem.valorTotal, 0);
+  const StatCard = ({ title, value, icon, color, subtitle }: any) => (
+    <Card sx={{
+      height: '100%',
+      bgcolor: 'background.paper',
+      border: '1px solid',
+      borderColor: 'divider',
+      boxShadow: 1
+    }}>
+      <CardContent>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Box>
+            <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 'bold' }}>
+              {title}
+            </Typography>
+            <Typography variant="h4" sx={{ my: 1, fontWeight: 800 }}>
+              {value}
+            </Typography>
+            <Typography variant="caption" sx={{ color: color === 'error' ? 'error.main' : 'text.secondary', fontWeight: 600 }}>
+              {subtitle}
+            </Typography>
+          </Box>
+          {/* O círculo colorido do ícone */}
+          <Box sx={{
+            bgcolor: `${color}.main`,
+            color: `${color}.contrastText`,
+            p: 1.5,
+            borderRadius: '12px',
+            display: 'flex',
+            height: 'fit-content'
+          }}>
+            {icon}
+          </Box>
+        </Box>
+      </CardContent>
+    </Card>
+  );
 
-  const ordensRecentes = [...ordensServico]
-    .sort((a, b) => new Date(b.dataEntrada).getTime() - new Date(a.dataEntrada).getTime())
-    .slice(0, 4);
-
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
-        <Typography variant="h6" color="text.secondary">Sincronizando oficina...</Typography>
-      </Box>
-    );
-  }
+  if (loading) return (
+    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}>
+      <CircularProgress color="primary" />
+    </Box>
+  );
 
   return (
-    <Box sx={{ pb: 8 }}>
-      {/* OVERDRIVE: Command Center Header */}
-      <Box sx={{ mb: 6 }}>
-        <Typography variant="overline" sx={{ color: 'text.secondary', mb: 1, display: 'block' }}>
-          Gestão de Atendimento
-        </Typography>
-        <Typography variant="h2" sx={{ color: 'primary.main', mb: 3 }}>
-          CENTRAL DE COMANDO
-        </Typography>
-        <Paper 
-          elevation={0} 
-          sx={{ 
-            p: 1.5, 
-            borderRadius: 5, 
-            display: 'flex', 
-            alignItems: 'center', 
-            border: '2px solid', 
-            borderColor: 'primary.main',
-            bgcolor: 'white',
-            boxShadow: '0 8px 30px rgba(0,0,0,0.08)',
-            transition: 'transform 0.2s',
-            '&:hover': { transform: 'translateY(-2px)' }
-          }}
-        >
-          <Avatar sx={{ bgcolor: 'primary.main', mr: 2 }}><SearchIcon /></Avatar>
-          <InputBase
-            sx={{ flex: 1, fontSize: '1.125rem', fontWeight: 700 }}
-            placeholder="Digite uma PLACA para iniciar um atendimento rápido..."
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                navigate('/ordens', { state: { openInstant: true, initialPlate: (e.target as HTMLInputElement).value } });
-              }
-            }}
+    <Box>
+      <Typography variant="h4" sx={{ mb: 4, fontWeight: 900 }}>
+        Dashboard Administrativo
+      </Typography>
+
+      <Grid container spacing={3}>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="OS em Aberto"
+            value={stats.osAbertas}
+            icon={<BuildIcon />}
+            color="primary" // Usa a cor preta do seu tema
+            subtitle="Pendentes de execução"
           />
-          <Button 
-            variant="contained" 
-            size="large" 
-            onClick={() => navigate('/ordens', { state: { openInstant: true } })}
-            sx={{ borderRadius: 4, px: 4, py: 1.5 }}
-          >
-            NOVA OS
-          </Button>
-        </Paper>
-      </Box>
-
-      <Grid container spacing={4}>
-        <Grid item xs={12} lg={8}>
-          <Stack spacing={4}>
-            {/* StatHero Component */}
-            <Paper 
-              elevation={0}
-              sx={{ 
-                p: 5, 
-                bgcolor: 'primary.main', 
-                color: 'primary.contrastText', 
-                borderRadius: 4,
-                position: 'relative',
-                overflow: 'hidden'
-              }}
-            >
-              <Stack direction={{ xs: 'column', md: 'row' }} spacing={4} alignItems="center" sx={{ position: 'relative', zIndex: 1 }}>
-                <Box sx={{ flex: 1 }}>
-                  <Typography variant="overline" sx={{ opacity: 0.8, fontWeight: 900, letterSpacing: '0.15em' }}>STATUS OPERACIONAL</Typography>
-                  <Typography variant="h1" sx={{ mt: 1, mb: 0.5 }}>{ordensAtivas}</Typography>
-                  <Typography variant="h6" sx={{ opacity: 0.9, fontWeight: 500 }}>Veículos sendo atendidos agora</Typography>
-                </Box>
-                <Stack direction="row" spacing={3}>
-                  <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="h3" sx={{ fontWeight: 900 }}>{totalClientes}</Typography>
-                    <Typography variant="caption" sx={{ opacity: 0.7, fontWeight: 800 }}>CLIENTES</Typography>
-                  </Box>
-                  <Box sx={{ textAlign: 'center' }}>
-                    <Typography variant="h3" sx={{ fontWeight: 900 }}>{totalVeiculos}</Typography>
-                    <Typography variant="caption" sx={{ opacity: 0.7, fontWeight: 800 }}>VEÍCULOS</Typography>
-                  </Box>
-                </Stack>
-              </Stack>
-              <BuildCircleIcon sx={{ position: 'absolute', right: -40, bottom: -40, fontSize: 280, opacity: 0.05, transform: 'rotate(-20deg)' }} />
-            </Paper>
-
-            <Box>
-              <Typography variant="h5" sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                <AssignmentIcon color="primary" fontSize="small" /> ATIVIDADES EM ANDAMENTO
-              </Typography>
-              <Grid container spacing={3}>
-                {ordensRecentes.map((ordem) => {
-                  const veiculo = veiculos.find(v => v.id === ordem.veiculoId);
-                  return (
-                    <Grid item xs={12} sm={6} key={ordem.id}>
-                      <Card elevation={0} sx={{ borderRadius: 4, border: '1px solid', borderColor: '#E2E8F0', transition: 'border-color 0.2s', '&:hover': { borderColor: 'primary.main' } }}>
-                        <CardContent sx={{ p: 3 }}>
-                          <Stack direction="row" justifyContent="space-between" mb={3}>
-                            <Chip label={ordem.status} size="small" sx={{ height: 24, fontSize: '0.65rem', px: 0.5 }} />
-                            <Typography variant="overline" sx={{ color: 'text.disabled' }}>OS #{ordem.id.slice(-6)}</Typography>
-                          </Stack>
-                          <Typography variant="h6" sx={{ mb: 0.5 }}>{veiculo?.marca} {veiculo?.modelo}</Typography>
-                          <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>{veiculo?.placa}</Typography>
-                          <Divider sx={{ my: 2.5, borderStyle: 'dashed' }} />
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                            <Box>
-                              <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block', mb: 0.5 }}>DATA ENTRADA</Typography>
-                              <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>{new Date(ordem.dataEntrada).toLocaleDateString('pt-BR')}</Typography>
-                            </Box>
-                            <Typography variant="h5" sx={{ color: 'primary.main', fontWeight: 900 }}>R$ {ordem.valorTotal.toFixed(2)}</Typography>
-                          </Box>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  );
-                })}
-              </Grid>
-            </Box>
-          </Stack>
         </Grid>
 
-        <Grid item xs={12} lg={4}>
-          <Stack spacing={4}>
-            <Paper elevation={0} sx={{ p: 4, borderRadius: 4, bgcolor: 'primary.main', color: 'primary.contrastText' }}>
-              <Typography variant="overline" sx={{ opacity: 0.8, fontWeight: 900 }}>RECEITA TOTAL</Typography>
-              <Typography variant="h2" sx={{ mt: 1, mb: 1.5, letterSpacing: '-0.03em', color: 'inherit' }}>R$ {faturamentoTotal.toFixed(2)}</Typography>
-              <Typography variant="body2" sx={{ opacity: 0.9, lineHeight: 1.5 }}>Volume total processado em serviços finalizados e orçamentos.</Typography>
-              <Button variant="contained" sx={{ mt: 4, bgcolor: 'white', color: 'black', fontWeight: 800, '&:hover': { bgcolor: '#F1F5F9' } }} fullWidth>
-                RELATÓRIO COMPLETO
-              </Button>
-            </Paper>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Receita Concluída"
+            value={`R$ ${stats.faturamentoMensal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+            icon={<MoneyIcon />}
+            color="success" // Usa o verde esmeralda do seu tema
+            subtitle="Total faturado"
+          />
+        </Grid>
 
-            <Paper elevation={0} sx={{ p: 4, borderRadius: 4 }}>
-              <Typography variant="subtitle2" sx={{ mb: 3, letterSpacing: '0.05em' }}>CLIENTES RECENTES</Typography>
-              <List disablePadding>
-                {clientes.slice(0, 3).map((cliente) => (
-                  <ListItem key={cliente.id} disableGutters sx={{ py: 2 }}>
-                    <Avatar sx={{ mr: 2, bgcolor: '#F1F5F9', color: 'text.secondary', width: 40, height: 40 }}><PeopleIcon fontSize="small" /></Avatar>
-                    <ListItemText 
-                      primary={cliente.nome} 
-                      primaryTypographyProps={{ variant: 'subtitle2', sx: { color: 'text.primary' } }} 
-                      secondary="Cliente registrado recentemente"
-                      secondaryTypographyProps={{ variant: 'caption', sx: { color: 'text.disabled' } }}
-                    />
-                  </ListItem>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Clientes"
+            value={stats.clientesNovos}
+            icon={<PeopleIcon />}
+            color="info" // Cor padrão MUI para info
+            subtitle="Cadastros totais"
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Atenção Estoque"
+            value={stats.estoqueBaixo}
+            icon={<InventoryIcon />}
+            color={stats.estoqueBaixo > 0 ? "error" : "success"}
+            subtitle="Itens críticos"
+          />
+        </Grid>
+
+        <Grid item xs={12}>
+          <TableContainer component={Paper} sx={{ mt: 3, border: '1px solid', borderColor: 'divider' }}>
+            <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <CarIcon color="primary" />
+              <Typography variant="h6">Ordens de Serviço Recentes</Typography>
+            </Box>
+            <Table>
+              <TableHead sx={{ bgcolor: 'action.hover' }}>
+                <TableRow>
+                  <TableCell>Status</TableCell>
+                  <TableCell>Descrição do Problema</TableCell>
+                  <TableCell align="right">Valor</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {stats.recentesOS.map((os, idx) => (
+                  <TableRow key={idx}>
+                    <TableCell>
+                      <Chip
+                        label={os.status}
+                        size="small"
+                        color={os.status === 'Concluída' || os.status === 'Finalizada' ? 'success' : 'warning'}
+                      />
+                    </TableCell>
+                    <TableCell>{os.descricao_problema || os.descricao || 'Sem descrição'}</TableCell>
+                    <TableCell align="right">
+                      R$ {Number(os.valor_total || os.valorTotal || 0).toFixed(2)}
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </List>
-            </Paper>
-          </Stack>
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Grid>
       </Grid>
     </Box>

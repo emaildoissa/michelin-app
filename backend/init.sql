@@ -125,3 +125,22 @@ INSERT INTO pecas (codigo, nome, marca, modelo_compativel, quantidade, preco) VA
 ('PF001', 'Pastilha de Freio Dianteira', 'Brembo', 'Fiat Uno', 20, 120.00),
 ('FL001', 'Filtro de Óleo', 'Mann', 'Universal', 40, 25.00),
 ('PN001', 'Pneu 185/65R15', 'Michelin', 'Universal', 15, 450.00);
+
+-- Adicionar coluna de custo na OS para cálculo de lucro
+ALTER TABLE ordens_servico ADD COLUMN IF NOT EXISTS valor_pecas DECIMAL(10, 2) DEFAULT 0;
+ALTER TABLE ordens_servico ADD COLUMN IF NOT EXISTS valor_maos_de_obra DECIMAL(10, 2) DEFAULT 0;
+
+-- Trigger para baixar estoque automaticamente ao inserir peça na OS
+CREATE OR REPLACE FUNCTION baixar_estoque_peca()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE pecas 
+    SET quantidade = quantidade - NEW.quantidade
+    WHERE id = NEW.peca_id;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_baixar_estoque
+AFTER INSERT ON ordem_servico_pecas
+FOR EACH ROW EXECUTE FUNCTION baixar_estoque_peca();
