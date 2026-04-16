@@ -93,7 +93,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router>
+      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Navbar />
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
           <Routes>

@@ -39,7 +39,7 @@ const OrdensServico = () => {
   const [servicos, setServicos] = useState<Servico[]>([]);
   const [pecas, setPecas] = useState<Peca[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
   const [ticketVehicle, setTicketVehicle] = useState<Veiculo | null>(null);
   const [ticketItems, setTicketItems] = useState<any[]>([]);
@@ -65,7 +65,7 @@ const OrdensServico = () => {
     }
   };
 
-  useEffect(() => { 
+  useEffect(() => {
     fetchData();
     if (location.state?.openInstant) {
       handleOpenWorkspace();
@@ -114,7 +114,7 @@ const OrdensServico = () => {
       };
       if (editingId) await api.put(`/ordens_servico/${editingId}`, payload);
       else await api.post('/ordens_servico', payload);
-      
+
       setSnackbar({ open: true, message: 'OS Processada com Sucesso', severity: 'success' });
       setWorkspaceOpen(false);
       fetchData();
@@ -277,10 +277,16 @@ const OrdensServico = () => {
                 <Typography variant="h6" sx={{ color: 'text.secondary' }}>Total</Typography>
                 <Typography variant="h2" sx={{ color: 'primary.main', letterSpacing: '-0.04em' }}>R$ {liveTotal.toFixed(2)}</Typography>
               </Stack>
-              <Stack direction="row" spacing={3}>
-                <Button fullWidth variant="outlined" size="large" onClick={() => handleSaveOS('Aguardando aprovação')} sx={{ borderRadius: 3.5, height: 64, borderWidth: 2, '&:hover': { borderWidth: 2 } }}>ORÇAMENTO</Button>
-                <Button fullWidth variant="contained" size="large" onClick={() => handleSaveOS('Em andamento')} disabled={!ticketVehicle} sx={{ borderRadius: 3.5, height: 64, bgcolor: 'success.main', '&:hover': { bgcolor: 'success.dark' } }}>INICIAR</Button>
-              </Stack>
+              {editingId ? (
+                <Button fullWidth variant="contained" size="large" onClick={() => handleSaveOS(selectedOrdem?.status || 'Em andamento')} disabled={!ticketVehicle} sx={{ borderRadius: 3.5, height: 64, bgcolor: 'primary.main', '&:hover': { bgcolor: 'primary.dark' } }}>
+                  SALVAR ALTERAÇÕES
+                </Button>
+              ) : (
+                <Stack direction="row" spacing={3}>
+                  <Button fullWidth variant="outlined" size="large" onClick={() => handleSaveOS('Aguardando aprovação')} sx={{ borderRadius: 3.5, height: 64, borderWidth: 2, '&:hover': { borderWidth: 2 } }}>ORÇAMENTO</Button>
+                  <Button fullWidth variant="contained" size="large" onClick={() => handleSaveOS('Em andamento')} disabled={!ticketVehicle} sx={{ borderRadius: 3.5, height: 64, bgcolor: 'success.main', '&:hover': { bgcolor: 'success.dark' } }}>INICIAR</Button>
+                </Stack>
+              )}
             </Paper>
           </Grid>
         </Grid>

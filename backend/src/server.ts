@@ -84,6 +84,7 @@ async function ordemToFrontend(row: any): Promise<any> {
 
   return {
     id: row.id,
+    numero_sequencial: row.numero_sequencial,
     veiculoId: row.veiculo_id,
     dataEntrada: row.data_abertura,
     dataSaida: row.data_conclusao,
@@ -558,7 +559,7 @@ app.post('/ordens_servico', async (req: Request, res: Response) => {
 
 app.put('/ordens_servico/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { status, servicosIds, pecasIds, descricao } = req.body;
+  const { status, servicosIds, pecasIds, descricao, veiculoId, valorTotal } = req.body;
   const client = await pool.connect();
 
   try {
@@ -566,27 +567,61 @@ app.put('/ordens_servico/:id', async (req: Request, res: Response) => {
 
     // 1. Verificar o estado atual da OS antes de atualizar
     const osAtual = await client.query('SELECT status FROM ordens_servico WHERE id = $1', [id]);
+    const isFullUpdate = veiculoId !== undefined;
+    const dataConclusao = (status === 'Concluída' || status === 'Finalizada') ? new Date() : null;
+    let result;
 
-    // 2. Atualizar a OS (incluindo data de conclusão se for finalizada)
-    const dataConclusao = (status === 'Concluída') ? new Date() : null;
+    if (isFullUpdate) {
+      result = await client.query(
+        `UPDATE ordens_servico 
+         SET veiculo_id = $1, descricao_problema = $2, status = $3, valor_total = $4, data_conclusao = $5
+         WHERE id = $6 RETURNING *`,
+        [veiculoId, descricao, status, valorTotal || 0, dataConclusao, id]
+      );
 
-    const result = await client.query(
-      `UPDATE ordens_servico 
-       SET status = $1, data_conclusao = $2, descricao_problema = $3
-       WHERE id = $4 RETURNING *`,
-      [status, dataConclusao, descricao, id]
-    );
-
-    // 3. LÓGICA ERP: Se acabou de ser concluída, baixar estoque
-    if (status === 'Concluída' && osAtual.rows[0].status !== 'Concluída') {
-      if (pecasIds && pecasIds.length > 0) {
-        for (const pId of pecasIds) {
-          // Diminui 1 unidade de cada peça usada (pode ser expandido para quantidade variável)
+      // Recriar vínculos de serviços
+      await client.query('DELETE FROM ordem_servico_servicos WHERE ordem_id = $1', [id]);
+      if (servicosIds && servicosIds.length > 0) {
+        for (const sId of servicosIds) {
+          const sRes = await client.query('SELECT valor FROM servicos WHERE id = $1', [sId]);
+          const vServ = sRes.rows[0]?.valor || 0;
           await client.query(
-            'UPDATE pecas SET quantidade = quantidade - 1 WHERE id = $1 AND quantidade > 0',
-            [pId]
+            'INSERT INTO ordem_servico_servicos (ordem_id, servico_id, valor_unitario, valor_total) VALUES ($1, $2, $3, $3)',
+            [id, sId, vServ]
           );
         }
+      }
+
+      // Recriar vínculos de peças
+      await client.query('DELETE FROM ordem_servico_pecas WHERE ordem_id = $1', [id]);
+      if (pecasIds && pecasIds.length > 0) {
+        for (const pId of pecasIds) {
+          const pRes = await client.query('SELECT preco FROM pecas WHERE id = $1', [pId]);
+          const vPeca = pRes.rows[0]?.preco || 0;
+          await client.query(
+            'INSERT INTO ordem_servico_pecas (ordem_id, peca_id, valor_unitario, valor_total) VALUES ($1, $2, $3, $3)',
+            [id, pId, vPeca]
+          );
+        }
+      }
+    } else {
+       result = await client.query(
+        `UPDATE ordens_servico 
+         SET status = $1, data_conclusao = COALESCE($2, data_conclusao), descricao_problema = COALESCE($3, descricao_problema)
+         WHERE id = $4 RETURNING *`,
+        [status, dataConclusao, descricao, id]
+      );
+    }
+
+    // LÓGICA ERP: Baixar estoque se a OS for nova ou foi finalizada agora
+    const currentStatus = osAtual.rows[0].status;
+    if ((status === 'Concluída' || status === 'Finalizada') && currentStatus !== 'Concluída' && currentStatus !== 'Finalizada') {
+      const dbPecas = await client.query('SELECT peca_id FROM ordem_servico_pecas WHERE ordem_id = $1', [id]);
+      for (const row of dbPecas.rows) {
+         await client.query(
+          'UPDATE pecas SET quantidade = quantidade - 1 WHERE id = $1 AND quantidade > 0',
+          [row.peca_id]
+         );
       }
     }
 
