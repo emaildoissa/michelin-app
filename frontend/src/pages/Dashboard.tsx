@@ -87,75 +87,136 @@ const Dashboard: React.FC = () => {
   };
 
   const StatCard = ({ title, value, icon, color, subtitle }: any) => (
-    <Card sx={{ height: '100%', border: '1px solid', borderColor: 'divider', boxShadow: 1 }}>
-      <CardContent>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Box>
-            <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 'bold' }}>{title}</Typography>
-            <Typography variant="h4" sx={{ my: 1, fontWeight: 800 }}>{value}</Typography>
-            <Typography variant="caption" sx={{ color: color === 'error' ? 'error.main' : 'text.secondary', fontWeight: 600 }}>{subtitle}</Typography>
+    <Card sx={{ 
+      height: '100%', 
+      transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+      '&:hover': { transform: 'translateY(-4px)', boxShadow: 4 }
+    }}>
+      <CardContent sx={{ p: 3 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <Box sx={{ 
+              bgcolor: `${color}.main`, 
+              color: `${color}.contrastText`, 
+              p: 1.25, 
+              borderRadius: '10px', 
+              display: 'flex',
+              boxShadow: `0 4px 12px ${color === 'primary' ? 'rgba(0,0,0,0.1)' : 'rgba(16,185,129,0.2)'}`
+            }}>
+              {React.cloneElement(icon as React.ReactElement, { fontSize: 'small' })}
+            </Box>
+            <Typography variant="caption" sx={{ color: color === 'error' ? 'error.main' : 'text.secondary', fontWeight: 800 }}>
+              {subtitle}
+            </Typography>
           </Box>
-          <Box sx={{ bgcolor: `${color}.main`, color: `${color}.contrastText`, p: 1.5, borderRadius: '12px', display: 'flex', height: 'fit-content' }}>
-            {icon}
+          <Box>
+            <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 700, opacity: 0.8 }}>
+              {title}
+            </Typography>
+            <Typography variant="h3" sx={{ mt: 0.5, fontWeight: 900, letterSpacing: '-0.02em' }}>
+              {value}
+            </Typography>
           </Box>
         </Box>
       </CardContent>
     </Card>
   );
 
-  if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}><CircularProgress /></Box>;
+  if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}><CircularProgress thickness={5} size={50} /></Box>;
 
   return (
-    <Box>
-      <Typography variant="h4" sx={{ mb: 4, fontWeight: 900 }}>Dashboard Administrativo</Typography>
+    <Box sx={{ py: 2 }}>
+      <Box sx={{ mb: 6 }}>
+        <Typography variant="h3" component="h1" sx={{ fontWeight: 900, letterSpacing: '-0.03em' }}>
+          Visão Geral
+        </Typography>
+        <Typography variant="body1" sx={{ color: 'text.secondary', mt: 1 }}>
+          Acompanhe o desempenho da sua oficina em tempo real.
+        </Typography>
+      </Box>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={4}>
         <Grid item xs={12} sm={6} md={3}><StatCard title="OS em Aberto" value={stats.osAbertas} icon={<BuildIcon />} color="primary" subtitle="Pendentes" /></Grid>
-        <Grid item xs={12} sm={6} md={3}><StatCard title="Receita Concluída" value={`R$ ${stats.faturamentoMensal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} icon={<MoneyIcon />} color="success" subtitle="Total faturado" /></Grid>
-        <Grid item xs={12} sm={6} md={3}><StatCard title="Clientes" value={stats.clientesNovos} icon={<PeopleIcon />} color="info" subtitle="Cadastros" /></Grid>
-        <Grid item xs={12} sm={6} md={3}><StatCard title="Atenção Estoque" value={stats.estoqueBaixo} icon={<InventoryIcon />} color={stats.estoqueBaixo > 0 ? "error" : "success"} subtitle="Críticos" /></Grid>
+        <Grid item xs={12} sm={6} md={3}><StatCard title="Receita Concluída" value={`R$ ${stats.faturamentoMensal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`} icon={<MoneyIcon />} color="success" subtitle="+12% este mês" /></Grid>
+        <Grid item xs={12} sm={6} md={3}><StatCard title="Total Clientes" value={stats.clientesNovos} icon={<PeopleIcon />} color="primary" subtitle="Base ativa" /></Grid>
+        <Grid item xs={12} sm={6} md={3}><StatCard title="Estoque Crítico" value={stats.estoqueBaixo} icon={<InventoryIcon />} color={stats.estoqueBaixo > 0 ? "error" : "success"} subtitle="Reposição" /></Grid>
 
         <Grid item xs={12}>
-          <TableContainer component={Paper} sx={{ mt: 3, border: '1px solid', borderColor: 'divider' }}>
-            <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-              <CarIcon color="primary" />
-              <Typography variant="h6">Controle de Ordens de Serviço</Typography>
-            </Box>
-            <Table>
-              <TableHead sx={{ bgcolor: 'action.hover' }}>
-                <TableRow>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Problema</TableCell>
-                  <TableCell align="right">Valor</TableCell>
-                  <TableCell align="center">Ação Rápida</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {stats.recentesOS.map((os) => (
-                  <TableRow key={os.id}>
-                    <TableCell>
-                      <Chip label={os.status} size="small" color={os.status === 'Finalizada' ? 'success' : 'warning'} />
-                    </TableCell>
-                    <TableCell>{os.descricao || 'Sem descrição'}</TableCell>
-                    <TableCell align="right">R$ {Number(os.valorTotal || 0).toFixed(2)}</TableCell>
-                    <TableCell align="center">
-                      {os.status !== 'Finalizada' && (
-                        <Button
-                          variant="contained"
-                          size="small"
-                          color="success"
-                          startIcon={<CheckIcon />}
-                          onClick={() => handleOpenFinalizar(os)}
-                        >
-                          Finalizar
-                        </Button>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <Box sx={{ mt: 4 }}>
+            <Paper sx={{ overflow: 'hidden', borderRadius: 4 }}>
+              <Box sx={{ px: 4, py: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid', borderColor: 'divider' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                  <CarIcon sx={{ color: 'primary.main', opacity: 0.8 }} />
+                  <Typography variant="h6" sx={{ fontWeight: 800 }}>Atividade Recente</Typography>
+                </Box>
+                <Button size="small" sx={{ fontWeight: 700 }}>Ver Todas</Button>
+              </Box>
+              <TableContainer>
+                <Table sx={{ minWidth: 650 }}>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Status</TableCell>
+                      <TableCell>Descrição do Serviço</TableCell>
+                      <TableCell align="right">Valor Total</TableCell>
+                      <TableCell align="center">Ações</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {stats.recentesOS.map((os) => (
+                      <TableRow key={os.id} hover sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                        <TableCell>
+                          <Chip 
+                            label={os.status} 
+                            size="small" 
+                            sx={{ 
+                              fontWeight: 900, 
+                              fontSize: '0.65rem',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.05em',
+                              bgcolor: os.status === 'Finalizada' ? 'rgba(46, 125, 50, 0.12)' : 'rgba(237, 108, 2, 0.12)',
+                              color: os.status === 'Finalizada' ? '#1b5e20' : '#e65100',
+                              border: '1px solid',
+                              borderColor: os.status === 'Finalizada' ? 'rgba(46, 125, 50, 0.2)' : 'rgba(237, 108, 2, 0.2)',
+                              '& .MuiChip-label': { px: 1.5 }
+                            }} 
+                          />
+                        </TableCell>
+                        <TableCell sx={{ fontWeight: 600, color: 'text.primary' }}>
+                          {os.descricao || 'Sem descrição detalhada'}
+                        </TableCell>
+                        <TableCell align="right" sx={{ fontWeight: 700, fontFamily: 'monospace', fontSize: '1rem' }}>
+                          R$ {Number(os.valorTotal || 0).toFixed(2)}
+                        </TableCell>
+                        <TableCell align="center">
+                          {os.status !== 'Finalizada' ? (
+                            <Button
+                              variant="contained"
+                              size="small"
+                              disableElevation
+                              sx={{ 
+                                borderRadius: 2, 
+                                py: 0.5, 
+                                px: 2, 
+                                fontSize: '0.75rem',
+                                bgcolor: 'primary.main',
+                                '&:hover': { bgcolor: 'primary.dark' }
+                              }}
+                              startIcon={<CheckIcon sx={{ fontSize: '1rem !important' }} />}
+                              onClick={() => handleOpenFinalizar(os)}
+                            >
+                              Finalizar
+                            </Button>
+                          ) : (
+                            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>Concluído</Typography>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
+          </Box>
         </Grid>
       </Grid>
 

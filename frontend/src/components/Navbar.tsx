@@ -29,82 +29,68 @@ const Navbar = () => {
   };
 
   const drawer = (
-    <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center', p: 2 }}>
-      <Box sx={{ py: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-        <Box sx={{ width: 60, height: 60, bgcolor: 'primary.main', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-          L
-        </Box>
-        <Typography variant="h6" sx={{ fontWeight: 800, letterSpacing: -0.5 }}>
-          OFICINA MECÂNICA
-        </Typography>
+    <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center', p: 3, bgcolor: '#000000', color: 'white', height: '100%' }}>
+      <Box sx={{ mb: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, pt: 2 }}>
+        <img src="/logo.png" alt="Michelin" style={{ height: '48px', objectFit: 'contain' }} />
       </Box>
-      <List>
-        {navItems.map((item) => (
-          <ListItem 
-            component={Link} 
-            to={item.path} 
-            key={item.text}
-            selected={location.pathname === item.path}
-            sx={{ 
-              borderRadius: 2,
-              mb: 0.5,
-              '&.Mui-selected': {
-                backgroundColor: 'rgba(0, 0, 0, 0.08)',
-                color: 'primary.main',
-                '& .MuiListItemIcon-root': { color: 'primary.main' }
-              }
-            }}
-          >
-            <ListItemIcon>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.text} primaryTypographyProps={{ fontWeight: 600 }} />
-          </ListItem>
-        ))}
+      <List sx={{ px: 1 }}>
+        {navItems.map((item) => {
+          const isActive = location.pathname === item.path;
+          return (
+            <ListItem 
+              component={Link} 
+              to={item.path} 
+              key={item.text}
+              sx={{ 
+                borderRadius: 3,
+                mb: 1,
+                py: 1.5,
+                bgcolor: isActive ? 'rgba(255,255,255,0.1)' : 'transparent',
+                color: isActive ? 'white' : 'rgba(255, 255, 255, 0.6)',
+                '&:hover': {
+                  bgcolor: 'rgba(255,255,255,0.15)',
+                  color: 'white'
+                },
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <ListItemIcon sx={{ color: 'inherit', minWidth: 40 }}>
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText 
+                primary={item.text} 
+                primaryTypographyProps={{ fontWeight: isActive ? 800 : 600, fontSize: '0.95rem' }} 
+              />
+            </ListItem>
+          );
+        })}
       </List>
     </Box>
   );
 
   return (
     <Box>
-      <AppBar position="sticky" elevation={0} sx={{ borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', color: 'text.primary' }}>
-        <Container maxWidth="xl">
+      <AppBar 
+        position="sticky" 
+        elevation={0} 
+        sx={{ 
+          borderBottom: '1px solid', 
+          borderColor: 'rgba(255,255,255,0.1)', 
+          bgcolor: '#000000', 
+          color: 'white',
+          py: 0.5
+        }}
+      >
+        <Container maxWidth="lg">
           <Toolbar disableGutters>
-            {isMobile && (
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                edge="start"
-                onClick={handleDrawerToggle}
-                sx={{ mr: 2 }}
-              >
-                <MenuIcon />
-              </IconButton>
-            )}
-            
-            <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Box id="logo-placeholder" sx={{ 
-                width: 40, 
-                height: 40, 
-                bgcolor: 'primary.main', 
-                borderRadius: '10px', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center', 
-                color: 'white',
-                fontWeight: 900
-              }}>
-                L
+            <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+              <Box component={Link} to="/" sx={{ display: 'flex', alignItems: 'center' }}>
+                <img src="/logo.png" alt="Michelin" style={{ height: '36px', objectFit: 'contain' }} />
               </Box>
-              <Typography
-                variant="h6"
-                component="div"
-                sx={{ fontWeight: 800, color: 'text.primary', letterSpacing: -0.5 }}
-              >
-                OFICINA MECÂNICA
-              </Typography>
             </Box>
 
-            {!isMobile && (
-              <Box sx={{ display: 'flex', gap: 0.5 }}>
+            {!isMobile ? (
+              <Box sx={{ display: 'flex', gap: 1 }}>
                 {navItems.map((item) => {
                   const isActive = location.pathname === item.path;
                   return (
@@ -113,35 +99,55 @@ const Navbar = () => {
                       component={Link} 
                       to={item.path} 
                       sx={{ 
-                        color: isActive ? 'primary.main' : 'text.secondary',
-                        px: 2,
+                        color: isActive ? 'white' : 'rgba(255, 255, 255, 0.65)',
+                        px: 2.5,
                         py: 1,
-                        borderRadius: 2,
-                        fontWeight: isActive ? 700 : 500,
-                        backgroundColor: isActive ? 'rgba(0, 0, 0, 0.04)' : 'transparent',
+                        borderRadius: 2.5,
+                        fontWeight: isActive ? 800 : 600,
+                        fontSize: '0.85rem',
+                        position: 'relative',
+                        '&::after': isActive ? {
+                          content: '""',
+                          position: 'absolute',
+                          bottom: 4,
+                          left: '20%',
+                          right: '20%',
+                          height: '2px',
+                          bgcolor: 'white',
+                          borderRadius: '2px'
+                        } : {},
                         '&:hover': { 
-                          backgroundColor: 'rgba(0, 0, 0, 0.08)',
-                          color: 'primary.main'
+                          bgcolor: 'rgba(255, 255, 255, 0.08)',
+                          color: 'white'
                         } 
                       }}
-                      startIcon={item.icon}
                     >
                       {item.text}
                     </Button>
                   );
                 })}
               </Box>
+            ) : (
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                edge="end"
+                onClick={handleDrawerToggle}
+              >
+                <MenuIcon />
+              </IconButton>
             )}
           </Toolbar>
         </Container>
       </AppBar>
       <Drawer
+        anchor="right"
         variant="temporary"
         open={mobileOpen}
         onClose={handleDrawerToggle}
         ModalProps={{ keepMounted: true }}
         sx={{
-          '& .MuiDrawer-paper': { width: 280 },
+          '& .MuiDrawer-paper': { width: 300, borderRadius: '24px 0 0 24px' },
         }}
       >
         {drawer}

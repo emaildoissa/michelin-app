@@ -15,16 +15,16 @@ const theme = createTheme(
   {
     palette: {
       primary: {
-        main: '#000000', // Noir Premium
-        dark: '#1a1a1a',
-        light: '#333333',
+        main: '#09090b', // Zinc 950 - deeper than pure black
+        dark: '#000000',
+        light: '#27272a',
         contrastText: '#ffffff'
       },
       secondary: {
-        main: '#ffffff', // White/Silver accent
-        dark: '#e2e8f0',
+        main: '#f4f4f5', // Zinc 100
+        dark: '#e4e4e7',
         light: '#ffffff',
-        contrastText: '#000000'
+        contrastText: '#09090b'
       },
       success: {
         main: '#10b981', // Emerald 500
@@ -35,52 +35,70 @@ const theme = createTheme(
         contrastText: '#ffffff'
       },
       background: {
-        default: '#f8fafc', // Slate 50
+        default: '#fafafa', // Very light gray
         paper: '#ffffff'
       },
       text: {
-        primary: '#0f172a', // Slate 900
-        secondary: '#475569' // Slate 600
-      }
+        primary: '#09090b', 
+        secondary: '#52525b' // Zinc 600
+      },
+      divider: '#e4e4e7'
     },
     shape: {
-      borderRadius: 12 // Modern, unified look
+      borderRadius: 12
     },
     typography: {
-      fontFamily: '"Inter", "system-ui", "-apple-system", sans-serif',
-      h1: { fontSize: '2.5rem', fontWeight: 900, lineHeight: 1.1, letterSpacing: '-0.02em' },
-      h2: { fontSize: '2rem', fontWeight: 800, lineHeight: 1.2, letterSpacing: '-0.01em' },
-      h3: { fontSize: '1.5rem', fontWeight: 800, lineHeight: 1.3 },
-      h4: { fontSize: '1.25rem', fontWeight: 700, lineHeight: 1.4 },
-      h5: { fontSize: '1.125rem', fontWeight: 700, lineHeight: 1.5 },
-      h6: { fontSize: '1rem', fontWeight: 700, lineHeight: 1.5 },
+      fontFamily: '"Figtree", "system-ui", "-apple-system", sans-serif',
+      h1: { fontSize: '3rem', fontWeight: 900, lineHeight: 1.1, letterSpacing: '-0.03em' },
+      h2: { fontSize: '2.25rem', fontWeight: 800, lineHeight: 1.2, letterSpacing: '-0.02em' },
+      h3: { fontSize: '1.75rem', fontWeight: 800, lineHeight: 1.3, letterSpacing: '-0.01em' },
+      h4: { fontSize: '1.5rem', fontWeight: 700, lineHeight: 1.4, letterSpacing: '-0.01em' },
+      h5: { fontSize: '1.25rem', fontWeight: 700, lineHeight: 1.5 },
+      h6: { fontSize: '1.125rem', fontWeight: 700, lineHeight: 1.5 },
       body1: { fontSize: '1rem', fontWeight: 400, lineHeight: 1.6 },
       body2: { fontSize: '0.875rem', fontWeight: 500, lineHeight: 1.5 },
       subtitle1: { fontSize: '1rem', fontWeight: 600, lineHeight: 1.5 },
       subtitle2: { fontSize: '0.875rem', fontWeight: 700, lineHeight: 1.4 },
       caption: { fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase' },
       overline: { fontSize: '0.625rem', fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase' },
-      button: { fontSize: '0.875rem', fontWeight: 800, textTransform: 'none', letterSpacing: '0.02em' }
+      button: { fontSize: '0.875rem', fontWeight: 700, textTransform: 'none', letterSpacing: '0.01em' }
     },
+    spacing: 8, // Base spacing unit
     components: {
       MuiButton: {
         styleOverrides: {
           root: {
             borderRadius: 8,
-            padding: '8px 20px',
+            padding: '10px 24px',
             boxShadow: 'none',
-            '&:hover': { boxShadow: 'none' }
+            '&:hover': { boxShadow: 'none' },
+            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
           },
           containedPrimary: {
-            '&:hover': { backgroundColor: '#1a1a1a' }
+            '&:hover': { backgroundColor: '#18181b' }
           }
         }
       },
       MuiPaper: {
         styleOverrides: {
           root: {
-            border: '1px solid #e2e8f0',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+            border: '1px solid #e4e4e7',
+            boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)'
+          }
+        }
+      },
+      MuiTableCell: {
+        styleOverrides: {
+          root: {
+            padding: '16px',
+            borderColor: '#f4f4f5'
+          },
+          head: {
+            fontWeight: 700,
+            color: '#71717a',
+            textTransform: 'uppercase',
+            fontSize: '0.75rem',
+            letterSpacing: '0.05em'
           }
         }
       }

@@ -25,7 +25,8 @@ import {
   Select,
   MenuItem,
   InputAdornment,
-  TableSortLabel
+  TableSortLabel,
+  Chip
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -34,6 +35,7 @@ import SearchIcon from '@mui/icons-material/Search';
 
 interface Veiculo {
   id: number;
+  numero_sequencial?: number;
   clienteId: string;
   marca: string;
   modelo: string;
@@ -225,7 +227,7 @@ const Veiculos = () => {
   const handleFiltroChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const valorFiltro = event.target.value.toLowerCase();
     setFiltro(valorFiltro);
-    
+
     if (valorFiltro === '') {
       setVeiculosFiltrados(veiculos);
     } else {
@@ -246,7 +248,7 @@ const Veiculos = () => {
   const handleOrdenacaoChange = (campo: keyof Veiculo) => {
     const ehMesmoCampo = ordenacao.campo === campo;
     const novaDirecao = ehMesmoCampo && ordenacao.direcao === 'asc' ? 'desc' : 'asc';
-    
+
     setOrdenacao({
       campo,
       direcao: novaDirecao
@@ -256,7 +258,7 @@ const Veiculos = () => {
       if (campo === 'clienteId') {
         const nomeClienteA = getClienteNome(a.clienteId).toLowerCase();
         const nomeClienteB = getClienteNome(b.clienteId).toLowerCase();
-        return novaDirecao === 'asc' 
+        return novaDirecao === 'asc'
           ? nomeClienteA.localeCompare(nomeClienteB)
           : nomeClienteB.localeCompare(nomeClienteA);
       }
@@ -281,207 +283,219 @@ const Veiculos = () => {
   };
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, gap: 2, mb: 3 }}>
-        <Typography variant="h4" sx={{ fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' } }} gutterBottom>
-          Veículos
-        </Typography>
+    <Box sx={{ flexGrow: 1, py: 2 }}>
+      <Box sx={{
+        display: 'flex',
+        flexDirection: { xs: 'column', sm: 'row' },
+        justifyContent: 'space-between',
+        alignItems: { xs: 'stretch', sm: 'center' },
+        gap: 3,
+        mb: 5
+      }}>
+        <Box>
+          <Typography variant="h3" sx={{ fontWeight: 900, letterSpacing: '-0.03em' }}>
+            Veículos
+          </Typography>
+          <Typography variant="body1" sx={{ color: 'text.secondary', mt: 0.5 }}>
+            Controle de frota e especificações técnicas.
+          </Typography>
+        </Box>
         <Button
           variant="contained"
-          color="primary"
+          disableElevation
           startIcon={<AddIcon />}
           onClick={() => handleOpenForm()}
-          fullWidth={window.innerWidth < 600}
-          sx={{ width: { xs: '100%', sm: 'auto' } }}
+          sx={{
+            px: 4,
+            py: 1.5,
+            borderRadius: 3,
+            fontWeight: 800,
+            fontSize: '0.9rem'
+          }}
         >
           Novo Veículo
         </Button>
       </Box>
 
-      <Box sx={{ mb: 3 }}>
+      <Box sx={{ mb: 4 }}>
         <TextField
           fullWidth
           variant="outlined"
-          placeholder="Buscar veículos por marca, modelo, placa, ano ou cliente"
+          placeholder="Buscar por marca, modelo, placa ou cliente..."
           value={filtro}
           onChange={handleFiltroChange}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <SearchIcon />
+                <SearchIcon sx={{ color: 'text.secondary', opacity: 0.5 }} />
               </InputAdornment>
             ),
+            sx: {
+              borderRadius: 3,
+              bgcolor: 'background.paper',
+              '& fieldset': { borderColor: 'divider' },
+              '&:hover fieldset': { borderColor: 'primary.main' }
+            }
           }}
         />
       </Box>
 
       {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-          <CircularProgress />
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}>
+          <CircularProgress thickness={5} size={40} />
         </Box>
       ) : (
-        <TableContainer component={Paper} elevation={3} sx={{ overflowX: 'auto' }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={ordenacao.campo === 'clienteId'}
-                    direction={ordenacao.campo === 'clienteId' ? ordenacao.direcao : 'asc'}
-                    onClick={() => handleOrdenacaoChange('clienteId')}
-                  >
-                    Cliente
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={ordenacao.campo === 'marca'}
-                    direction={ordenacao.campo === 'marca' ? ordenacao.direcao : 'asc'}
-                    onClick={() => handleOrdenacaoChange('marca')}
-                  >
-                    Marca
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={ordenacao.campo === 'modelo'}
-                    direction={ordenacao.campo === 'modelo' ? ordenacao.direcao : 'asc'}
-                    onClick={() => handleOrdenacaoChange('modelo')}
-                  >
-                    Modelo
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={ordenacao.campo === 'ano'}
-                    direction={ordenacao.campo === 'ano' ? ordenacao.direcao : 'asc'}
-                    onClick={() => handleOrdenacaoChange('ano')}
-                  >
-                    Ano
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={ordenacao.campo === 'placa'}
-                    direction={ordenacao.campo === 'placa' ? ordenacao.direcao : 'asc'}
-                    onClick={() => handleOrdenacaoChange('placa')}
-                  >
-                    Placa
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell align="center">Ações</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {veiculosFiltrados.length > 0 ? (
-                veiculosFiltrados.map((veiculo) => (
-                  <TableRow key={veiculo.id}>
-                    <TableCell>{veiculo.id}</TableCell>
-                    <TableCell>{getClienteNome(veiculo.clienteId)}</TableCell>
-                    <TableCell>{veiculo.marca}</TableCell>
-                    <TableCell>{veiculo.modelo}</TableCell>
-                    <TableCell>{veiculo.ano}</TableCell>
-                    <TableCell>{veiculo.placa}</TableCell>
-                    <TableCell align="center">
-                      <IconButton
-                        color="primary"
-                        onClick={() => handleOpenForm(veiculo)}
-                        size="small"
-                      >
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton
-                        color="error"
-                        onClick={() => handleOpenDelete(veiculo.id)}
-                        size="small"
-                      >
-                        <DeleteIcon />
-                      </IconButton>
+        <Paper sx={{ overflow: 'hidden', borderRadius: 4 }}>
+          <TableContainer>
+            <Table sx={{ minWidth: 650 }}>
+              <TableHead>
+                <TableRow>
+                  <TableCell width="80">ID</TableCell>
+                  <TableCell>
+                    <TableSortLabel
+                      active={ordenacao.campo === 'clienteId'}
+                      direction={ordenacao.campo === 'clienteId' ? ordenacao.direcao : 'asc'}
+                      onClick={() => handleOrdenacaoChange('clienteId')}
+                      sx={{ fontWeight: 800 }}
+                    >
+                      Cliente
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell>Marca / Modelo</TableCell>
+                  <TableCell>Ano</TableCell>
+                  <TableCell>Placa</TableCell>
+                  <TableCell align="center">Ações</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {veiculosFiltrados.length > 0 ? (
+                  veiculosFiltrados.map((veiculo) => (
+                    <TableRow key={veiculo.id} hover>
+                      <TableCell sx={{ color: 'text.secondary', fontWeight: 600 }}>#{veiculo.numero_sequencial || String(veiculo.id).slice(0, 5).toUpperCase()}</TableCell>
+                      <TableCell sx={{ fontWeight: 700, color: 'text.primary' }}>{getClienteNome(veiculo.clienteId)}</TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                          <Typography variant="body2" sx={{ fontWeight: 700 }}>{veiculo.marca}</Typography>
+                          <Typography variant="caption" sx={{ color: 'text.secondary' }}>{veiculo.modelo}</Typography>
+                        </Box>
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 600 }}>{veiculo.ano}</TableCell>
+                      <TableCell>
+                        <Chip
+                          label={veiculo.placa}
+                          size="small"
+                          sx={{
+                            fontWeight: 800,
+                            fontFamily: 'monospace',
+                            bgcolor: 'rgba(0,0,0,0.04)',
+                            borderRadius: 1.5,
+                            border: '1px solid',
+                            borderColor: 'divider'
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell align="center">
+                        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
+                          <IconButton
+                            onClick={() => handleOpenForm(veiculo)}
+                            size="small"
+                            sx={{ color: 'primary.main', bgcolor: 'rgba(0,0,0,0.03)', '&:hover': { bgcolor: 'rgba(0,0,0,0.08)' } }}
+                          >
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            onClick={() => handleOpenDelete(veiculo.id)}
+                            size="small"
+                            sx={{ color: 'error.main', bgcolor: 'rgba(239,68,68,0.05)', '&:hover': { bgcolor: 'rgba(239,68,68,0.1)' } }}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
+                      <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                        Nenhum veículo encontrado.
+                      </Typography>
                     </TableCell>
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={7} align="center">
-                    Nenhum veículo cadastrado
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Paper>
       )}
 
       {/* Formulário de Veículo */}
-      <Dialog open={openForm} onClose={handleCloseForm} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingId ? 'Editar Veículo' : 'Novo Veículo'}</DialogTitle>
+      <Dialog
+        open={openForm}
+        onClose={handleCloseForm}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{ sx: { borderRadius: 4, p: 1 } }}
+      >
+        <DialogTitle sx={{ fontWeight: 900, fontSize: '1.5rem', letterSpacing: '-0.02em' }}>
+          {editingId ? 'Editar Veículo' : 'Novo Veículo'}
+        </DialogTitle>
         <DialogContent>
-          <FormControl fullWidth margin="dense" sx={{ mb: 2, mt: 1 }}>
-            <InputLabel id="cliente-label">Cliente</InputLabel>
-            <Select
-              labelId="cliente-label"
-              value={formData.clienteId}
-              onChange={handleSelectChange}
-              label="Cliente"
-            >
-              {clientes.map((cliente) => (
-                <MenuItem key={cliente.id} value={cliente.id}>
-                  {cliente.nome}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <TextField
-            margin="dense"
-            name="marca"
-            label="Marca"
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={formData.marca}
-            onChange={handleInputChange}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            margin="dense"
-            name="modelo"
-            label="Modelo"
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={formData.modelo}
-            onChange={handleInputChange}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            margin="dense"
-            name="ano"
-            label="Ano"
-            type="number"
-            fullWidth
-            variant="outlined"
-            value={formData.ano}
-            onChange={handleInputChange}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            margin="dense"
-            name="placa"
-            label="Placa"
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={formData.placa}
-            onChange={handleInputChange}
-          />
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, mt: 1 }}>
+            <FormControl fullWidth>
+              <InputLabel id="cliente-label">Cliente</InputLabel>
+              <Select
+                labelId="cliente-label"
+                value={formData.clienteId}
+                onChange={handleSelectChange}
+                label="Cliente"
+              >
+                {clientes.map((cliente) => (
+                  <MenuItem key={cliente.id} value={cliente.id}>
+                    {cliente.nome}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <TextField
+              name="marca"
+              label="Marca"
+              fullWidth
+              value={formData.marca}
+              onChange={handleInputChange}
+            />
+            <TextField
+              name="modelo"
+              label="Modelo"
+              fullWidth
+              value={formData.modelo}
+              onChange={handleInputChange}
+            />
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <TextField
+                name="ano"
+                label="Ano"
+                type="number"
+                fullWidth
+                value={formData.ano}
+                onChange={handleInputChange}
+              />
+              <TextField
+                name="placa"
+                label="Placa"
+                fullWidth
+                value={formData.placa}
+                onChange={handleInputChange}
+              />
+            </Box>
+          </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseForm} color="inherit">
+        <DialogActions sx={{ p: 3, gap: 1 }}>
+          <Button onClick={handleCloseForm} color="inherit" sx={{ fontWeight: 700 }}>
             Cancelar
           </Button>
-          <Button onClick={handleSubmit} color="primary" variant="contained">
-            Salvar
+          <Button onClick={handleSubmit} variant="contained" disableElevation sx={{ px: 4, fontWeight: 800 }}>
+            {editingId ? 'Salvar Alterações' : 'Adicionar Veículo'}
           </Button>
         </DialogActions>
       </Dialog>

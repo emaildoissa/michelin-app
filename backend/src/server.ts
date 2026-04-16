@@ -25,6 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 function clienteToFrontend(row: any) {
   return {
     id: row.id,
+    numero_sequencial: row.numero_sequencial,
     nome: row.nome,
     email: row.email,
     telefone: row.telefone,
@@ -35,6 +36,7 @@ function clienteToFrontend(row: any) {
 function veiculoToFrontend(row: any) {
   return {
     id: row.id,
+    numero_sequencial: row.numero_sequencial,
     clienteId: row.cliente_id,
     marca: row.marca,
     modelo: row.modelo,
@@ -48,6 +50,7 @@ function veiculoToFrontend(row: any) {
 function servicoToFrontend(row: any) {
   return {
     id: row.id,
+    numero_sequencial: row.numero_sequencial,
     nome: row.nome,
     descricao: row.descricao,
     valor: parseFloat(row.valor),
@@ -58,6 +61,7 @@ function servicoToFrontend(row: any) {
 function pecaToFrontend(row: any) {
   return {
     id: row.id,
+    numero_sequencial: row.numero_sequencial,
     nome: row.nome,
     codigo: row.codigo,
     marca: row.marca,

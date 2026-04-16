@@ -21,7 +21,8 @@ import {
   Snackbar,
   Alert,
   InputAdornment,
-  TableSortLabel
+  TableSortLabel,
+  Chip
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -30,6 +31,7 @@ import SearchIcon from '@mui/icons-material/Search';
 
 interface Servico {
   id: number;
+  numero_sequencial?: number;
   nome: string;
   descricao: string;
   valor: number;
@@ -199,11 +201,11 @@ const Servicos = () => {
   const handleFiltroChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const valorFiltro = event.target.value.toLowerCase();
     setFiltro(valorFiltro);
-    
+
     if (valorFiltro === '') {
       setServicosFiltrados(servicos);
     } else {
-      const filtrados = servicos.filter(servico => 
+      const filtrados = servicos.filter(servico =>
         servico.nome.toLowerCase().includes(valorFiltro) ||
         servico.descricao.toLowerCase().includes(valorFiltro) ||
         servico.valor.toString().includes(valorFiltro) ||
@@ -216,7 +218,7 @@ const Servicos = () => {
   const handleOrdenacaoChange = (campo: keyof Servico) => {
     const ehMesmoCampo = ordenacao.campo === campo;
     const novaDirecao = ehMesmoCampo && ordenacao.direcao === 'asc' ? 'desc' : 'asc';
-    
+
     setOrdenacao({
       campo,
       direcao: novaDirecao
@@ -229,29 +231,29 @@ const Servicos = () => {
 
       const aValue = String(a[campo]).toLowerCase();
       const bValue = String(b[campo]).toLowerCase();
-      
-      return novaDirecao === 'asc' 
+
+      return novaDirecao === 'asc'
         ? aValue.localeCompare(bValue, 'pt-BR')
         : bValue.localeCompare(aValue, 'pt-BR');
     });
 
     setServicosFiltrados(servicosOrdenados);
   };
-  
+
   // Aplicar ordenação quando os dados mudam
   useEffect(() => {
     if (ordenacao.campo !== '') {
       const servicosOrdenados = [...servicosFiltrados].sort((a, b) => {
         const campoOrdenacao = ordenacao.campo as keyof Servico;
-        
+
         if (campoOrdenacao === 'valor') {
           return ordenacao.direcao === 'asc' ? a.valor - b.valor : b.valor - a.valor;
         }
 
         const aValue = String(a[campoOrdenacao]).toLowerCase();
         const bValue = String(b[campoOrdenacao]).toLowerCase();
-        
-        return ordenacao.direcao === 'asc' 
+
+        return ordenacao.direcao === 'asc'
           ? aValue.localeCompare(bValue, 'pt-BR')
           : bValue.localeCompare(aValue, 'pt-BR');
       });
@@ -260,186 +262,204 @@ const Servicos = () => {
   }, [servicos]);
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, gap: 2, mb: 3 }}>
-        <Typography variant="h4" sx={{ fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' } }} gutterBottom>
-          Serviços
-        </Typography>
+    <Box sx={{ flexGrow: 1, py: 2 }}>
+      <Box sx={{
+        display: 'flex',
+        flexDirection: { xs: 'column', sm: 'row' },
+        justifyContent: 'space-between',
+        alignItems: { xs: 'stretch', sm: 'center' },
+        gap: 3,
+        mb: 5
+      }}>
+        <Box>
+          <Typography variant="h3" sx={{ fontWeight: 900, letterSpacing: '-0.03em' }}>
+            Serviços
+          </Typography>
+          <Typography variant="body1" sx={{ color: 'text.secondary', mt: 0.5 }}>
+            Catálogo de mão de obra e tempos estimados.
+          </Typography>
+        </Box>
         <Button
           variant="contained"
-          color="primary"
+          disableElevation
           startIcon={<AddIcon />}
           onClick={() => handleOpenForm()}
-          fullWidth={window.innerWidth < 600}
-          sx={{ width: { xs: '100%', sm: 'auto' } }}
+          sx={{
+            px: 4,
+            py: 1.5,
+            borderRadius: 3,
+            fontWeight: 800,
+            fontSize: '0.9rem'
+          }}
         >
           Novo Serviço
         </Button>
       </Box>
-      
-      <Box sx={{ mb: 3 }}>
+
+      <Box sx={{ mb: 4 }}>
         <TextField
           fullWidth
           variant="outlined"
-          placeholder="Buscar serviços por nome, descrição, valor ou tempo estimado"
+          placeholder="Buscar serviços por nome ou descrição..."
           value={filtro}
           onChange={handleFiltroChange}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <SearchIcon />
+                <SearchIcon sx={{ color: 'text.secondary', opacity: 0.5 }} />
               </InputAdornment>
             ),
+            sx: {
+              borderRadius: 3,
+              bgcolor: 'background.paper',
+              '& fieldset': { borderColor: 'divider' },
+              '&:hover fieldset': { borderColor: 'primary.main' }
+            }
           }}
         />
       </Box>
 
       {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-          <CircularProgress />
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}>
+          <CircularProgress thickness={5} size={40} />
         </Box>
       ) : (
-        <TableContainer component={Paper} elevation={3} sx={{ overflowX: 'auto' }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={ordenacao.campo === 'nome'}
-                    direction={ordenacao.campo === 'nome' ? ordenacao.direcao : 'asc'}
-                    onClick={() => handleOrdenacaoChange('nome')}
-                  >
-                    Nome
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={ordenacao.campo === 'descricao'}
-                    direction={ordenacao.campo === 'descricao' ? ordenacao.direcao : 'asc'}
-                    onClick={() => handleOrdenacaoChange('descricao')}
-                  >
-                    Descrição
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={ordenacao.campo === 'valor'}
-                    direction={ordenacao.campo === 'valor' ? ordenacao.direcao : 'asc'}
-                    onClick={() => handleOrdenacaoChange('valor')}
-                  >
-                    Valor
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={ordenacao.campo === 'tempoEstimado'}
-                    direction={ordenacao.campo === 'tempoEstimado' ? ordenacao.direcao : 'asc'}
-                    onClick={() => handleOrdenacaoChange('tempoEstimado')}
-                  >
-                    Tempo Estimado
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell align="center">Ações</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {servicosFiltrados.length > 0 ? (
-                servicosFiltrados.map((servico) => (
-                  <TableRow key={servico.id}>
-                    <TableCell>{servico.id}</TableCell>
-                    <TableCell>{servico.nome}</TableCell>
-                    <TableCell>{servico.descricao}</TableCell>
-                    <TableCell>{formatarValor(servico.valor)}</TableCell>
-                    <TableCell>{servico.tempoEstimado}</TableCell>
-                    <TableCell align="center">
-                      <IconButton
-                        color="primary"
-                        onClick={() => handleOpenForm(servico)}
-                        size="small"
-                      >
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton
-                        color="error"
-                        onClick={() => handleOpenDelete(servico.id)}
-                        size="small"
-                      >
-                        <DeleteIcon />
-                      </IconButton>
+        <Paper sx={{ overflow: 'hidden', borderRadius: 4 }}>
+          <TableContainer>
+            <Table sx={{ minWidth: 650 }}>
+              <TableHead>
+                <TableRow>
+                  <TableCell width="80">ID</TableCell>
+                  <TableCell>
+                    <TableSortLabel
+                      active={ordenacao.campo === 'nome'}
+                      direction={ordenacao.campo === 'nome' ? ordenacao.direcao : 'asc'}
+                      onClick={() => handleOrdenacaoChange('nome')}
+                      sx={{ fontWeight: 800 }}
+                    >
+                      Nome do Serviço
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell>Descrição</TableCell>
+                  <TableCell align="right">Valor</TableCell>
+                  <TableCell>Tempo Estimado</TableCell>
+                  <TableCell align="center">Ações</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {servicosFiltrados.length > 0 ? (
+                  servicosFiltrados.map((servico) => (
+                    <TableRow key={servico.id} hover>
+                      <TableCell sx={{ color: 'text.secondary', fontWeight: 600 }}>#{servico.numero_sequencial || String(servico.id).slice(0, 5).toUpperCase()}</TableCell>
+                      <TableCell sx={{ fontWeight: 700, color: 'text.primary' }}>{servico.nome}</TableCell>
+                      <TableCell sx={{ maxWidth: 300, color: 'text.secondary' }}>{servico.descricao}</TableCell>
+                      <TableCell align="right">
+                        <Typography variant="body2" sx={{ fontWeight: 800, color: 'primary.main', fontFamily: 'monospace' }}>
+                          {formatarValor(servico.valor)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={servico.tempoEstimado}
+                          size="small"
+                          variant="outlined"
+                          sx={{ fontWeight: 700, borderRadius: 1.5, borderColor: 'divider' }}
+                        />
+                      </TableCell>
+                      <TableCell align="center">
+                        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
+                          <IconButton
+                            onClick={() => handleOpenForm(servico)}
+                            size="small"
+                            sx={{ color: 'primary.main', bgcolor: 'rgba(0,0,0,0.03)', '&:hover': { bgcolor: 'rgba(0,0,0,0.08)' } }}
+                          >
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            onClick={() => handleOpenDelete(servico.id)}
+                            size="small"
+                            sx={{ color: 'error.main', bgcolor: 'rgba(239,68,68,0.05)', '&:hover': { bgcolor: 'rgba(239,68,68,0.1)' } }}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
+                      <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                        Nenhum serviço encontrado.
+                      </Typography>
                     </TableCell>
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={6} align="center">
-                    Nenhum serviço cadastrado
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Paper>
       )}
 
       {/* Formulário de Serviço */}
-      <Dialog open={openForm} onClose={handleCloseForm} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingId ? 'Editar Serviço' : 'Novo Serviço'}</DialogTitle>
+      <Dialog
+        open={openForm}
+        onClose={handleCloseForm}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{ sx: { borderRadius: 4, p: 1 } }}
+      >
+        <DialogTitle sx={{ fontWeight: 900, fontSize: '1.5rem', letterSpacing: '-0.02em' }}>
+          {editingId ? 'Editar Serviço' : 'Novo Serviço'}
+        </DialogTitle>
         <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            name="nome"
-            label="Nome do Serviço"
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={formData.nome}
-            onChange={handleInputChange}
-            sx={{ mb: 2, mt: 1 }}
-          />
-          <TextField
-            margin="dense"
-            name="descricao"
-            label="Descrição"
-            type="text"
-            fullWidth
-            multiline
-            rows={3}
-            variant="outlined"
-            value={formData.descricao}
-            onChange={handleInputChange}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            margin="dense"
-            name="valor"
-            label="Valor"
-            type="number"
-            fullWidth
-            variant="outlined"
-            value={formData.valor}
-            onChange={handleInputChange}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            margin="dense"
-            name="tempoEstimado"
-            label="Tempo Estimado"
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={formData.tempoEstimado}
-            onChange={handleInputChange}
-            placeholder="Ex: 2 horas"
-          />
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, mt: 1 }}>
+            <TextField
+              autoFocus
+              name="nome"
+              label="Nome do Serviço"
+              fullWidth
+              value={formData.nome}
+              onChange={handleInputChange}
+            />
+            <TextField
+              name="descricao"
+              label="Descrição"
+              multiline
+              rows={3}
+              fullWidth
+              value={formData.descricao}
+              onChange={handleInputChange}
+            />
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <TextField
+                name="valor"
+                label="Valor"
+                type="number"
+                fullWidth
+                value={formData.valor}
+                onChange={handleInputChange}
+                InputProps={{
+                  startAdornment: <InputAdornment position="start">R$</InputAdornment>,
+                }}
+              />
+              <TextField
+                name="tempoEstimado"
+                label="Tempo Estimado"
+                fullWidth
+                value={formData.tempoEstimado}
+                onChange={handleInputChange}
+                placeholder="Ex: 2 horas"
+              />
+            </Box>
+          </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseForm} color="inherit">
+        <DialogActions sx={{ p: 3, gap: 1 }}>
+          <Button onClick={handleCloseForm} color="inherit" sx={{ fontWeight: 700 }}>
             Cancelar
           </Button>
-          <Button onClick={handleSubmit} color="primary" variant="contained">
-            Salvar
+          <Button onClick={handleSubmit} variant="contained" disableElevation sx={{ px: 4, fontWeight: 800 }}>
+            {editingId ? 'Salvar Alterações' : 'Adicionar Serviço'}
           </Button>
         </DialogActions>
       </Dialog>

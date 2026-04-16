@@ -1,11 +1,11 @@
 :root {
-  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Figtree', system-ui, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: #1a1a1a;
-  background-color: #f8f9fa;
+  color-scheme: light;
+  color: #09090b;
+  background-color: #fafafa;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -13,76 +13,36 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 600;
-  color: #000000;
-  text-decoration: none;
-  transition: opacity 0.2s ease;
-}
-a:hover {
-  opacity: 0.7;
-  text-decoration: underline;
-}
-
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background-color: #fafafa;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  color: #000000;
-  margin-top: 0;
+#root {
+  min-height: 100vh;
 }
 
-button {
-  border-radius: 6px;
-  border: 1px solid #000000;
-  padding: 0.6em 1.2em;
-  font-size: 0.875rem;
-  font-weight: 600;
-  font-family: inherit;
-  background-color: #000000;
-  color: #ffffff;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+* {
+  box-sizing: border-box;
 }
 
-button:hover {
-  background-color: #333333;
-  border-color: #333333;
+/* Custom scrollbar for a more premium feel */
+::-webkit-scrollbar {
+  width: 10px;
 }
 
-button:focus,
-button:focus-visible {
-  outline: 2px solid #000000;
-  outline-offset: 2px;
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: rgba(255, 255, 255, 0.87);
-    background-color: #121212;
-  }
-  
-  a {
-    color: #ffffff;
-  }
-  
-  h1, h2, h3, h4, h5, h6 {
-    color: #ffffff;
-  }
+::-webkit-scrollbar-thumb {
+  background: #d4d4d8;
+  border-radius: 5px;
+  border: 2px solid #f1f1f1;
+}
 
-  button {
-    background-color: #ffffff;
-    color: #000000;
-    border-color: #ffffff;
-  }
-
-  button:hover {
-    background-color: #e0e0e0;
-    border-color: #e0e0e0;
-  }
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1aa;
 }
